@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:invoice_api/invoice_api.dart';
+import 'package:invoice_api_client/invoice_api_client.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:bl_objects_repository/user/index.dart'
     show UserRepository, UserResponse;
@@ -13,10 +13,10 @@ class UserCubit extends HydratedCubit<UserState> {
 
   //was machen mit userList so wie beim client_cubit und test schreiben
   final UserRepository _userRepository;
-  List<User> _userList = [];
+  List<UserDTOReceive> _userList = [];
   int _skip = 0;
 
-  Future<void> updateUser(User user) async {
+  Future<void> updateUser(UserDTOReceive user) async {
 
     emit(LoadingState());
 
@@ -80,7 +80,7 @@ class UserCubit extends HydratedCubit<UserState> {
     }
   }
 
-  Future<void> insertUser(User user) async {
+  Future<void> insertUser(UserDTOReceive user) async {
 
     emit(LoadingState());
 

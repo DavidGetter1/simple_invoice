@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:invoice_api/invoice_api.dart';
+import 'package:invoice_api_client/invoice_api_client.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:bl_objects_repository/item/index.dart'
     show ItemRepository, ItemResponse;

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:invoice_api/invoice_api.dart';
+import 'package:invoice_api_client/invoice_api_client.dart';
 
 import 'models/clientResponse.dart';
 

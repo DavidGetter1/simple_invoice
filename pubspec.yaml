@@ -49,14 +49,17 @@ dependencies:
 
   # go_router: ^3.1.0
   go_router: ^3.1.0
+  firebase_core: ^1.22.0
   flutter_bloc: ^8.1.1
   hydrated_bloc: ^9.0.0-dev.3
   json_annotation: ^4.6.0
   path_provider: ^2.0.8
   bl_objects_repository:
     path: packages/bl_objects_repository
-  invoice_api:
-    path: packages/invoice_api
+  invoice_api_client:
+    path: packages/invoice_api_client
+  authentication:
+    path: packages/authentication
   # Simplifying the use of both Material and Cupertino widgets with a single widget
   #flutter_platform_widgets: ^1.20.0
 

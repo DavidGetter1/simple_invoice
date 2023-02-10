@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:invoice_api/invoice_api.dart';
+import 'package:invoice_api_client/invoice_api_client.dart';
+import 'package:invoice_api_client/users/models/userDTOSend.dart';
 
 import 'models/userResponse.dart';
 
@@ -12,8 +13,8 @@ class UserRepository {
 
   final UserApiClient _userApiClient;
 
-  Future<User> getUser(String id) async{
-    User user = await _userApiClient.getUserById(id);
+  Future<UserDTOReceive> getUser(String id) async{
+    UserDTOReceive user = await _userApiClient.getUserById(id);
     return user;
   }
 
@@ -27,12 +28,13 @@ class UserRepository {
     await _userApiClient.deleteUser(id);
   }
 
-  Future<String> insertUser(User user) async{
-    String insertedId = await _userApiClient.insertUser(user);
+  Future<String> insertUserDTO(UserDTOSend user) async{
+    String insertedId = await _userApiClient.insertUserDTO(user);
     return insertedId;
   }
 
-  updateUser(User user) async{
+
+  updateUser(UserDTOReceive user) async{
     await _userApiClient.updateUser(user);
   }
 }

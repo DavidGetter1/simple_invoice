@@ -18,7 +18,7 @@ Map<String, dynamic> _$UserCreatedStateToJson(UserCreatedState instance) =>
 
 UserFetchedState _$UserFetchedStateFromJson(Map<String, dynamic> json) =>
     UserFetchedState(
-      user: User.fromJson(json['user'] as Map<String, dynamic>),
+      user: UserDTOReceive.fromJson(json['user'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$UserFetchedStateToJson(UserFetchedState instance) =>
@@ -30,7 +30,7 @@ UserListFetchedState _$UserListFetchedStateFromJson(
         Map<String, dynamic> json) =>
     UserListFetchedState(
       userList: (json['userList'] as List<dynamic>)
-          .map((e) => User.fromJson(e as Map<String, dynamic>))
+          .map((e) => UserDTOReceive.fromJson(e as Map<String, dynamic>))
           .toList(),
       lastN: json['lastN'] as int,
     );

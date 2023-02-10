@@ -1,4 +1,10 @@
+import 'package:easyinvoice/authentication/authentication_bloc.dart';
+import 'package:easyinvoice/authentication/authentication_event.dart';
+import 'package:easyinvoice/authentication/authentication_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../../authentication/authentication_cubit.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -59,8 +65,22 @@ class SettingsScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
             ),
             ListTile(
-              title: Text("Change Logo"),
-            )
+              onTap: () async => context.read<AuthenticationBloc>()..add(LogInWithSocialLoginGoogle()),
+              title: Text("login with google"),
+            ),
+            ListTile(
+              onTap: () async => await context.read<AuthenticationBloc>()..add(LogOut()),
+              title: Text("signout"),
+            ),
+            BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                bloc: context.read<AuthenticationBloc>(),
+                builder: (context, state) {
+                  return ListTile(
+                    onTap: () async => context.read<AuthenticationBloc>()..add(LogInWithSocialLoginGoogle()),
+                    title: Text("Authentication status:" + state.toString()),
+                  );
+                }
+            ),
           ],
         ),
       ),

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:invoice_api/invoice_api.dart';
+import 'package:invoice_api_client/invoice_api_client.dart';
 
 class ClientResponse extends Equatable {
   final List<Client> clientList;

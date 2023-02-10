@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:bloc_test/bloc_test.dart';
 import 'package:easyinvoice/bl_objects/user/user_cubit.dart';
-import 'package:invoice_api/invoice_api.dart';
+import 'package:invoice_api/invoice_api_client.dart';
 
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';

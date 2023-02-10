@@ -1,7 +1,9 @@
+import 'package:authentication/authentication.dart';
 import 'package:bl_objects_repository/client/index.dart';
 import 'package:bl_objects_repository/invoice/repository.dart';
 import 'package:bl_objects_repository/item/repository.dart';
 import 'package:bl_objects_repository/user/repository.dart';
+import 'package:easyinvoice/authentication/authentication_cubit.dart';
 import 'package:easyinvoice/src/features/invoices/presentation/screens/create_invoice_screen.dart';
 import 'package:easyinvoice/src/features/invoices/presentation/screens/invoice_detail_screen.dart';
 import 'package:easyinvoice/src/start.dart';
@@ -10,13 +12,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../authentication/authentication_bloc.dart';
 import '../bl_objects/client/client_cubit.dart';
 import '../bl_objects/item/item_cubit.dart';
 import '../bl_objects/invoice/invoice_cubit.dart';
 import '../bl_objects/user/user_cubit.dart';
 class MyApp extends StatelessWidget {
-  MyApp({Key? key, required this.itemRepository, required this.clientRepository, required this.invoiceRepository, required this.userRepository}) : super(key: key);
+  MyApp({Key? key, required this.authenticationRepository, required this.itemRepository, required this.clientRepository, required this.invoiceRepository, required this.userRepository}) : super(key: key);
 
+  final AuthenticationRepository authenticationRepository;
   final UserRepository userRepository;
   final InvoiceRepository invoiceRepository;
   final ItemRepository itemRepository;
@@ -45,6 +49,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider<AuthenticationRepository>(
+          create: (context) => AuthenticationRepository(),
+        ),
         RepositoryProvider<ItemRepository>(
         create: (context) => ItemRepository(),
         ),
@@ -60,6 +67,9 @@ class MyApp extends StatelessWidget {
       ],
       child: MultiBlocProvider(
       providers: [
+        BlocProvider<AuthenticationBloc>(
+          create: (BuildContext context) => AuthenticationBloc(authenticationRepository: context.read<AuthenticationRepository>(), userRepository: context.read<UserRepository>()),
+        ),
         BlocProvider<ItemCubit>(
           create: (BuildContext context) => ItemCubit(context.read<ItemRepository>()),
         ),
