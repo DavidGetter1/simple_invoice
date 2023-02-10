@@ -32,7 +32,7 @@ class UserCreatedState extends UserState{
 
 @JsonSerializable(explicitToJson: true)
 class UserFetchedState extends UserState {
-  final UserDTOReceive user;
+  final User user;
   const UserFetchedState({required this.user});
 
   factory UserFetchedState.fromJson(Map<String, dynamic> json) =>
@@ -47,7 +47,7 @@ class UserFetchedState extends UserState {
 @JsonSerializable(explicitToJson: true)
 class UserListFetchedState extends UserState {
   final int lastN;
-  final List<UserDTOReceive> userList;
+  final List<User> userList;
   const UserListFetchedState({required this.userList, required this.lastN});
 
   factory UserListFetchedState.fromJson(Map<String, dynamic> json) =>

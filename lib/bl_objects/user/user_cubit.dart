@@ -1,6 +1,8 @@
+import 'package:easyinvoice/bl_objects/user/models/user_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:invoice_api_client/invoice_api_client.dart';
+import 'package:invoice_api_client/users/models/userDTOSend.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:bl_objects_repository/user/index.dart'
     show UserRepository, UserResponse;
@@ -36,8 +38,9 @@ class UserCubit extends HydratedCubit<UserState> {
 
     try {
       final user = await _userRepository.getUser(id);
-
-      emit(UserFetchedState(user: user));
+      final userSend = UserDTOSend.fromDTOReceive(user);
+      final userEntity = User.fromUserDTOSend(userSend);
+      emit(UserFetchedState(user: userEntity));
     } on Exception {
       emit(const FailureState(errorMessage: 'errorMessage'));
     }
@@ -80,7 +83,7 @@ class UserCubit extends HydratedCubit<UserState> {
     }
   }
 
-  Future<void> insertUser(UserDTOReceive user) async {
+  Future<void> insertUser(User user) async {
 
     emit(LoadingState());
 
