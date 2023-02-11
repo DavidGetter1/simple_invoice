@@ -1,14 +1,16 @@
 // ignore_for_file: prefer_const_constructors
-import 'package:invoice_api/invoice_api_client.dart' as invoice_api;
-import 'package:invoice_api/invoice_api_client.dart';
+import 'package:invoice_api_client/invoice_api_client.dart' as invoice_api;
 import 'package:bl_objects_repository/user/index.dart';
+import 'package:invoice_api_client/invoice_api_client.dart';
+import 'package:invoice_api_client/users/models/userDTOReceive.dart';
+import 'package:invoice_api_client/users/models/userDTOSend.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 class MockUserApiClient extends Mock
     implements invoice_api.UserApiClient {}
 
-class MockUser extends Mock implements invoice_api.User { }
+class MockUserDTOReceive extends Mock implements invoice_api.UserDTOReceive { }
 void main() {
   group('UserRepository', () {
     late invoice_api.UserApiClient userApiClient;
@@ -47,15 +49,12 @@ void main() {
       });
 
       test('returns correct User on success', () async {
-        final user = User(
+        final user = UserDTOReceive(
             id: '62e393a5fb12b967fea3d9d0',
             name: "sigmund",
             billingInformation: BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"),
             locale: Locale.DE,
             email: "g@g.com",
-            welcomeScreenData1: false,
-            welcomeScreenData2: false,
-            welcomeScreenData3: false,
             creationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
             purchaseToken: ["daweef32r34t45t23e23e"],
             hasPremium: false,
@@ -69,15 +68,12 @@ void main() {
         final actual = await userRepository.getUser(id);
         expect(
           actual,
-          User(
+          UserDTOReceive(
               id: '62e393a5fb12b967fea3d9d0',
               name: "sigmund",
               billingInformation: BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"),
               locale: Locale.DE,
               email: "g@g.com",
-              welcomeScreenData1: false,
-              welcomeScreenData2: false,
-              welcomeScreenData3: false,
               creationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
               purchaseToken: ["daweef32r34t45t23e23e"],
               hasPremium: false,
@@ -99,15 +95,12 @@ void main() {
       });
 
       test('returns correct Object on success', () async {
-        final user = User(
+        final user = UserDTOReceive(
             id: '62e393a5fb12b967fea3d9d0',
             name: "sigmund",
             billingInformation: BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"),
             locale: Locale.DE,
             email: "g@g.com",
-            welcomeScreenData1: false,
-            welcomeScreenData2: false,
-            welcomeScreenData3: false,
             creationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
             purchaseToken: ["daweef32r34t45t23e23e"],
             hasPremium: false,
@@ -121,15 +114,12 @@ void main() {
         final actual = await userRepository.getUsers({});
         expect(
             actual,
-            UserResponse(userList: [User(
+            UserResponse(userList: [UserDTOReceive(
                 id: '62e393a5fb12b967fea3d9d0',
                 name: "sigmund",
                 billingInformation: BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"),
                 locale: Locale.DE,
                 email: "g@g.com",
-                welcomeScreenData1: false,
-                welcomeScreenData2: false,
-                welcomeScreenData3: false,
                 creationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
                 purchaseToken: ["daweef32r34t45t23e23e"],
                 hasPremium: false,
@@ -143,21 +133,13 @@ void main() {
 
     });
     group('updateUser', () {
-      final user = User(
+      final user = UserDTOSend(
           id: '62e393a5fb12b967fea3d9d0',
           name: "sigmund",
           billingInformation: BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"),
           locale: Locale.DE,
           email: "g@g.com",
-          welcomeScreenData1: false,
-          welcomeScreenData2: false,
-          welcomeScreenData3: false,
-          creationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
-          purchaseToken: ["daweef32r34t45t23e23e"],
           hasPremium: false,
-          originalTransactionId: "originalTransactionId",
-          subscriptionExpirationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
-          modifiedDate: DateTime.parse("2022-08-11T09:12:11.524Z")
       );
       test('calls update with correct user', () async {
         try {
@@ -167,21 +149,13 @@ void main() {
       });
     });
     group('insert', () {
-      final user = User(
+      final user = UserDTOSend(
           id: '62e393a5fb12b967fea3d9d0',
           name: "sigmund",
           billingInformation: BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"),
           locale: Locale.DE,
           email: "g@g.com",
-          welcomeScreenData1: false,
-          welcomeScreenData2: false,
-          welcomeScreenData3: false,
-          creationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
-          purchaseToken: ["daweef32r34t45t23e23e"],
-          hasPremium: false,
-          originalTransactionId: "originalTransactionId",
-          subscriptionExpirationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
-          modifiedDate: DateTime.parse("2022-08-11T09:12:11.524Z")
+          hasPremium: false
       );
       test('calls insert with correct user', () async {
         try {

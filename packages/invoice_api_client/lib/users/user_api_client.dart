@@ -110,7 +110,7 @@ class UserApiClient {
   /**
    * Inserts the [UserDTO] into the DB.
    */
-  insertUserDTO(UserDTOSend user) async {
+  insertUser(UserDTOSend user) async {
     final userRequest = Uri.https(
       _baseUrl,
       '/api/v1/bl_objects/user',
@@ -131,7 +131,7 @@ class UserApiClient {
   /**
    * Inserts the [UserDTOReceive] into the DB.
    */
-  updateUser(UserDTOReceive user) async {
+  updateUser(UserDTOSend user) async {
     final userRequest = Uri.https(
       _baseUrl,
       '/api/v1/bl_objects/user',

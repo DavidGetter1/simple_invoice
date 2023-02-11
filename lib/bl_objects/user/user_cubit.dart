@@ -15,15 +15,15 @@ class UserCubit extends HydratedCubit<UserState> {
 
   //was machen mit userList so wie beim client_cubit und test schreiben
   final UserRepository _userRepository;
-  List<UserDTOReceive> _userList = [];
+  List<User> _userList = [];
   int _skip = 0;
 
-  Future<void> updateUser(UserDTOReceive user) async {
+  Future<void> updateUser(User user) async {
 
     emit(LoadingState());
-
+    UserDTOSend userDTOSend = user.toDTOSend();
     try {
-      await _userRepository.updateUser(user);
+      await _userRepository.updateUser(userDTOSend);
 
       emit(UserUpdatedState());
     } on Exception {
@@ -38,8 +38,7 @@ class UserCubit extends HydratedCubit<UserState> {
 
     try {
       final user = await _userRepository.getUser(id);
-      final userSend = UserDTOSend.fromDTOReceive(user);
-      final userEntity = User.fromUserDTOSend(userSend);
+      final userEntity = User.fromUserDTOReceive(user);
       emit(UserFetchedState(user: userEntity));
     } on Exception {
       emit(const FailureState(errorMessage: 'errorMessage'));
@@ -76,7 +75,8 @@ class UserCubit extends HydratedCubit<UserState> {
         emit(NoMoreResultsState());
         return;
       }
-      _userList += response.userList;
+      _userList += response.userList.map((e) => User.fromUserDTOReceive(e)).toList();
+
       emit(UserListFetchedState(userList: _userList, lastN: response.lastN));
     } on Exception {
       emit(const FailureState(errorMessage: 'errorMessage'));
@@ -86,9 +86,9 @@ class UserCubit extends HydratedCubit<UserState> {
   Future<void> insertUser(User user) async {
 
     emit(LoadingState());
-
+    UserDTOSend userDTOSend = user.toDTOSend();
     try {
-      final String id = await _userRepository.insertUser(user);
+      final String id = await _userRepository.insertUser(userDTOSend);
 
       emit(UserCreatedState(id: id));
     } on Exception {

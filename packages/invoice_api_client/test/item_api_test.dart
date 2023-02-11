@@ -2,7 +2,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:invoice_api/invoice_api_client.dart';
+import 'package:invoice_api_client/invoice_api_client.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 

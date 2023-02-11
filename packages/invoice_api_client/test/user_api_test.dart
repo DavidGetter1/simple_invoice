@@ -1,8 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
-import 'package:invoice_api/invoice_api_client.dart';
+import 'package:invoice_api_client/invoice_api_client.dart';
+import 'package:invoice_api_client/users/models/userDTOSend.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -10,7 +12,9 @@ class MockHttpClient extends Mock implements http.Client {}
 
 class MockResponse extends Mock implements http.Response {}
 
-class MockUser extends Mock implements User {}
+class MockUserDTOSend extends Mock implements UserDTOSend {}
+
+class MockUserDTOReceive extends Mock implements UserDTOReceive {}
 
 class FakeUri extends Fake implements Uri {}
 
@@ -48,7 +52,7 @@ void main() {
     "matchedCount": 1
 }''');
         when(() => httpClient.put(any(), body: {})).thenAnswer((_) async => response);
-        User fakeUser = MockUser();
+        UserDTOSend fakeUser = MockUserDTOSend();
         when(fakeUser.toJson).thenReturn({});
         final body = jsonEncode(fakeUser.toJson());
         try {
@@ -77,7 +81,7 @@ void main() {
     "upsertedCount": 0,
     "matchedCount": 1
 }''');
-        User fakeUser = MockUser();
+        UserDTOSend fakeUser = MockUserDTOSend();
         when(fakeUser.toJson).thenReturn({});
         final body = jsonEncode(fakeUser.toJson());
 
@@ -94,7 +98,7 @@ void main() {
         when(() => response.body).thenReturn('''{
     "error on updating user"
 }''');
-        User fakeUser = MockUser();
+        UserDTOSend fakeUser = MockUserDTOSend();
         when(fakeUser.toJson).thenReturn({});
         final body = jsonEncode(fakeUser.toJson());
 
@@ -116,7 +120,7 @@ void main() {
         "insertedId": "62e393a5fb12b967fea3d9d0"
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-        User fakeUser = MockUser();
+        UserDTOSend fakeUser = MockUserDTOSend();
         when(fakeUser.toJson).thenReturn({});
         final body = jsonEncode(fakeUser.toJson());
         try {
@@ -140,7 +144,7 @@ void main() {
         "acknowledged": true,
         "insertedId": "62e393a5fb12b967fea3d9d0"
 }''');
-        User fakeUser = MockUser();
+        UserDTOSend fakeUser = MockUserDTOSend();
         when(fakeUser.toJson).thenReturn({});
         final body = jsonEncode(fakeUser.toJson());
         when(() => httpClient.post(any(), body: body, headers: {"Content-Type": "application/json"})).thenAnswer((_) async => response);
@@ -158,7 +162,7 @@ void main() {
         when(() => response.body).thenReturn('''{
     "error on inserting user"
 }''');
-        User fakeUser = MockUser();
+        UserDTOSend fakeUser = MockUserDTOSend();
         when(fakeUser.toJson).thenReturn({});
         final body = jsonEncode(fakeUser.toJson());
         when(() => httpClient.put(any(),body: body, headers: {"Content-Type": "application/json"} )).thenAnswer((_) async => response);
@@ -276,7 +280,7 @@ void main() {
 
         expect(
           actual,
-          isA<User>()
+          isA<UserDTOReceive>()
               .having((l) => l.hasPremium, 'hasPremium', false)
               .having((l) => l.originalTransactionId, 'originalTransactionId', '')
               .having((l) => l.purchaseToken, 'purchaseToken', [])
@@ -284,11 +288,8 @@ void main() {
               .having((l) => l.name, 'name', 'abcedfghijklmnopqrstuvwxyztest')
               .having((l) => l.id, 'id', '62e393a5fb12b967fea3d9d0')
               .having((l) => l.email, 'email', 'demarcus@gmx.de')
-              .having((l) => l.welcomeScreenData1, 'welcomeScreenData1', false)
               .having((l) => l.locale, 'locale', Locale.DE)
               .having((l) => l.billingInformation, 'billingInformation', BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"))
-              .having((l) => l.welcomeScreenData2, 'welcomeScreenData2', false)
-              .having((l) => l.welcomeScreenData3, 'welcomeScreenData3', false)
               .having((l) => l.creationDate, 'creationDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
               .having((l) => l.modifiedDate, 'modifiedDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
         );
@@ -337,7 +338,7 @@ void main() {
         print(actual);
         expect(
           actual["userList"][0],
-          isA<User>()
+          isA<UserDTOReceive>()
               .having((l) => l.hasPremium, 'hasPremium', false)
               .having((l) => l.originalTransactionId, 'originalTransactionId', '')
               .having((l) => l.purchaseToken, 'purchaseToken', [])
@@ -345,11 +346,8 @@ void main() {
               .having((l) => l.name, 'name', 'abcedfghijklmnopqrstuvwxyztest')
               .having((l) => l.id, 'id', '62e393a5fb12b967fea3d9d0')
               .having((l) => l.email, 'email', 'demarcus@gmx.de')
-              .having((l) => l.welcomeScreenData1, 'welcomeScreenData1', false)
               .having((l) => l.locale, 'locale', Locale.DE)
               .having((l) => l.billingInformation, 'billingInformation', BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"))
-              .having((l) => l.welcomeScreenData2, 'welcomeScreenData2', false)
-              .having((l) => l.welcomeScreenData3, 'welcomeScreenData3', false)
               .having((l) => l.creationDate, 'creationDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
               .having((l) => l.modifiedDate, 'modifiedDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
         );

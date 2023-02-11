@@ -49,21 +49,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider<AuthenticationRepository>(
-          create: (context) => AuthenticationRepository(),
-        ),
-        RepositoryProvider<ItemRepository>(
-        create: (context) => ItemRepository(),
-        ),
-        RepositoryProvider<ClientRepository>(
-          create: (context) => ClientRepository(),
-        ),
-        RepositoryProvider<InvoiceRepository>(
-          create: (context) => InvoiceRepository(),
-        ),
-        RepositoryProvider<UserRepository>(
-          create: (context) => UserRepository(),
-        ),
+        RepositoryProvider.value(value: authenticationRepository),
+        RepositoryProvider.value(value: itemRepository),
+        RepositoryProvider.value(value: clientRepository),
+        RepositoryProvider.value(value: invoiceRepository),
+        RepositoryProvider.value(value: userRepository)
       ],
       child: MultiBlocProvider(
       providers: [

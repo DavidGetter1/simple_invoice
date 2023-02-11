@@ -28,13 +28,13 @@ class UserRepository {
     await _userApiClient.deleteUser(id);
   }
 
-  Future<String> insertUserDTO(UserDTOSend user) async{
-    String insertedId = await _userApiClient.insertUserDTO(user);
+  Future<String> insertUser(UserDTOSend user) async{
+    String insertedId = await _userApiClient.insertUser(user);
     return insertedId;
   }
 
 
-  updateUser(UserDTOReceive user) async{
+  updateUser(UserDTOSend user) async{
     await _userApiClient.updateUser(user);
   }
 }
