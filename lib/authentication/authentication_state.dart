@@ -14,8 +14,8 @@ class AuthenticationUninitialized extends AuthenticationState {
 class AuthenticationAuthenticated extends AuthenticationState {
   final String id;
 
-  const AuthenticationAuthenticated({required this.id})
-      : assert(id != null);
+  AuthenticationAuthenticated({required this.id, required Function callback})
+      : assert(id != null){callback();}
 
   @override
   List<Object> get props => [id];

@@ -25,14 +25,14 @@ Client _$ClientFromJson(Map<String, dynamic> json) => $checkedCreate(
               'creationDate', (v) => DateTime.parse(v as String)),
           modifiedDate: $checkedConvert(
               'modifiedDate', (v) => DateTime.parse(v as String)),
-          id: $checkedConvert('_id', (v) => v as String),
+          id: $checkedConvert('id', (v) => v as String),
         );
         return val;
       },
     );
 
 Map<String, dynamic> _$ClientToJson(Client instance) => <String, dynamic>{
-      '_id': instance.id,
+      'id': instance.id,
       'userId': instance.userId,
       'name': instance.name,
       'streetName': instance.streetName,

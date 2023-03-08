@@ -17,8 +17,11 @@ BillingInformation _$BillingInformationFromJson(Map<String, dynamic> json) =>
           taxNumber: $checkedConvert('taxNumber', (v) => v as String),
           germanUstId: $checkedConvert('germanUstId', (v) => v as String),
           streetName: $checkedConvert('streetName', (v) => v as String),
-          paymentInformation: $checkedConvert('paymentInformation',
-              (v) => PaymentInformation.fromJson(v as Map<String, dynamic>)),
+          paymentInformation: $checkedConvert(
+              'paymentInformation',
+              (v) => v == null
+                  ? null
+                  : PaymentInformation.fromJson(v as Map<String, dynamic>)),
           streetNumber: $checkedConvert('streetNumber', (v) => v as String),
           postalCode: $checkedConvert('postalCode', (v) => v as String),
           city: $checkedConvert('city', (v) => v as String),

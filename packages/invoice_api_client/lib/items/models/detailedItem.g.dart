@@ -21,7 +21,7 @@ DetailedItem _$DetailedItemFromJson(Map<String, dynamic> json) =>
           item: $checkedConvert(
               'item',
               (v) =>
-                  v == null ? null : Item.fromJson(v as Map<String, dynamic>)),
+                  v == null ? null : ItemDTOReceive.fromJson(v as Map<String, dynamic>)),
         );
         return val;
       },

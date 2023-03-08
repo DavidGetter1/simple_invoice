@@ -1,4 +1,4 @@
-export 'items/models/item.dart';
+export 'items/models/itemDTOReceive.dart';
 export 'invoices/models/invoice.dart';
 export 'users/models/userDTOReceive.dart';
 export 'src/models/billingInformation.dart';

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:invoice_api_client/invoice_api_client.dart';
+import 'package:invoice_api_client/items/models/itemDTOSend.dart';
 
 import 'models/itemResponse.dart';
 
@@ -12,27 +13,47 @@ class ItemRepository {
 
   final ItemApiClient _itemApiClient;
 
-  Future<Item> getItem(String id) async{
-    Item item = await _itemApiClient.getItemById(id);
+  Future<ItemDTOReceive> getItem(String id) async {
+    ItemDTOReceive item = await _itemApiClient.getItemById(id);
     return item;
   }
 
-  Future<ItemResponse> getItems(Map<String, String> query) async{
+  Future<ItemResponse> getItems(Map<String, String> query) async {
     Map<String, dynamic> responseMap = await _itemApiClient.getItems(query);
-    ItemResponse itemResponse = ItemResponse(itemList: responseMap["itemList"], lastN: responseMap["lastN"]);
+    ItemResponse itemResponse = ItemResponse(
+        itemList: responseMap["itemList"], lastN: responseMap["lastN"]);
     return itemResponse;
   }
 
-  deleteItem(String id) async{
+  deleteItem(String id) async {
     await _itemApiClient.deleteItem(id);
   }
 
-  Future<String> insertItem(Item item) async{
+  Future<String> insertItem({
+    required String userId,
+    required String title,
+    required double pricePerUnit,
+    required String description,
+    required double tax,
+    required double discount,
+    required bool taxIncluded,
+    required double taxedAmount,
+  }) async {
+    final item = ItemDTOSend(
+      userId: userId,
+      title: title,
+      pricePerUnit: pricePerUnit,
+      description: description,
+      tax: tax,
+      discount: discount,
+      taxIncluded: taxIncluded,
+      taxedAmount: taxedAmount,
+    );
     String insertedId = await _itemApiClient.insertItem(item);
     return insertedId;
   }
 
-  updateItem(Item item) async{
+  updateItem(ItemDTOReceive item) async {
     await _itemApiClient.updateItem(item);
   }
 }

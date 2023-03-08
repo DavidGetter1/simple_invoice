@@ -24,9 +24,9 @@ class UserDTOSend extends Equatable {
 
 
   factory UserDTOSend.fromJson(Map<String, dynamic> json) =>
-      _$UserDTOFromJson(json);
+      _$UserDTOSendFromJson(json);
 
-  Map<String, dynamic> toJson() => _$UserDTOToJson(this);
+  Map<String, dynamic> toJson() => _$UserDTOSendToJson(this);
 
   @override
   List<Object?> get props => [billingInformation, email, hasPremium, locale, name];

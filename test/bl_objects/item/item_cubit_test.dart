@@ -15,19 +15,19 @@ import '../../helpers/hydrated_bloc.dart';
 class MockItemRepository extends Mock
     implements item_repository.ItemRepository {}
 
-class MockItem extends Mock implements Item {}
+class MockItem extends Mock implements ItemDTOReceive {}
 
 void main() {
   initHydratedStorage();
 
   group('itemCubit', () {
-    late Item item;
+    late ItemDTOReceive item;
     late item_repository.ItemRepository itemRepository;
     late ItemCubit itemCubit;
-    late Item ritem;
-    late Item ritem2;
+    late ItemDTOReceive ritem;
+    late ItemDTOReceive ritem2;
     setUp(() async {
-      ritem = Item(
+      ritem = ItemDTOReceive(
           userId: '62e393a5fb12b967fea3d9d0',
           id: '62e393a5fb12b967fea3d9d0',
           title: 'abcefghijklmnopqrstuvwxyztest',
@@ -40,7 +40,7 @@ void main() {
           taxedAmount: 15,
           description: "Bricks for construction"
       );
-      ritem2 = Item(
+      ritem2 = ItemDTOReceive(
           userId: '62e393a5fb12b967fea3d9d0',
           id: '62e393a5fb12b967fea3d9d0',
           title: 'abcefghijklmnopqrstuvwxyztest',

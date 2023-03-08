@@ -23,7 +23,7 @@ Locale stringToLocale(String localeString) {
       throw Exception('Unsupported locale string');
   }
 }
-
+@JsonSerializable(explicitToJson: true)
 class UserDTOReceive extends Equatable{
   const UserDTOReceive( {
     required this.id,
@@ -67,9 +67,9 @@ class UserDTOReceive extends Equatable{
   }
 
   factory UserDTOReceive.fromJson(Map<String, dynamic> json) =>
-      _$UserFromJson(json);
+      _$UserDTOReceiveFromJson(json);
 
-  Map<String, dynamic> toJson() => _$UserToJson(this);
+  Map<String, dynamic> toJson() => _$UserDTOReceiveToJson(this);
 
   UserDTOReceive copyWth({
     String? id,

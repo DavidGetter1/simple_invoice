@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:invoice_api_client/invoice_api_client.dart';
 
+import 'models/itemDTOSend.dart';
+
 /// Exception thrown when locationSearch fails.
 class ItemIdRequestFailure implements Exception {
   String message;
@@ -27,7 +29,7 @@ class ItemApiClient {
   final http.Client _httpClient;
 
   /**
-   * Deletes an [Item] by ID.
+   * Deletes an [ItemDTOReceive] by ID.
    */
   deleteItem(String id) async {
     final itemRequest = Uri.https(
@@ -35,28 +37,26 @@ class ItemApiClient {
       '/api/v1/bl_objects/item/$id',
     );
     final itemResponse = await _httpClient.delete(itemRequest);
-  print(itemResponse.body);
+    print(itemResponse.body);
     if (itemResponse.statusCode != 200) {
       throw Exception(itemResponse.body);
     }
 
-    final itemJson = jsonDecode(
-        itemResponse.body
-    );
+    final itemJson = jsonDecode(itemResponse.body);
 
-    if(itemJson["deletedCount"] != 1){
+    if (itemJson["deletedCount"] != 1) {
       throw new Exception('No items deleted');
     }
   }
 
   /**
-   * Fetches an [Item] by ID.
+   * Fetches an [ItemDTOReceive] by ID.
    */
   dynamic getItemById(String id) async {
     print("fetching");
     final itemRequest = Uri.https(
       _baseUrl,
-        '/api/v1/bl_objects/item/$id',
+      '/api/v1/bl_objects/item/$id',
     );
     final itemResponse = await _httpClient.get(itemRequest);
 
@@ -64,88 +64,82 @@ class ItemApiClient {
       throw ItemIdRequestFailure(itemResponse.body.toString());
     }
 
-    final itemJson = jsonDecode(
-      itemResponse.body
-    );
+    final itemJson = jsonDecode(itemResponse.body);
 
-    if(itemJson == {}){
+    if (itemJson == {}) {
       throw new Exception('No items found');
     }
 
-    try{
-    Item item = Item.fromJson(itemJson as Map<String, dynamic>);
-    return item;
-  }catch(e){
-    print(e.toString());
-    }}
+    try {
+      ItemDTOReceive item =
+          ItemDTOReceive.fromJson(itemJson as Map<String, dynamic>);
+      return item;
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   /**
    * Queries the DB for items.
    */
   dynamic getItems(Map<String, String> query) async {
     jsonEncode(query);
-    final itemRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/item',
-      query
-    );
+    final itemRequest = Uri.https(_baseUrl, '/api/v1/bl_objects/item', query);
     final itemResponse = await _httpClient.get(itemRequest);
     if (itemResponse.statusCode != 200) {
       throw new Exception(itemResponse.body);
     }
 
-    final itemJson = jsonDecode(
-        itemResponse.body
-    );
-    if(itemJson["data"].isEmpty){
+    final itemJson = jsonDecode(itemResponse.body);
+    if (itemJson["data"].isEmpty) {
       throw new Exception('No items found');
     }
-    try{
-      List<Item> itemList = List<Item>.from(itemJson["data"].map((item) => Item.fromJson(item)).toList());
+    try {
+      List<ItemDTOReceive> itemList = List<ItemDTOReceive>.from(itemJson["data"]
+          .map((item) => ItemDTOReceive.fromJson(item))
+          .toList());
       return {"itemList": itemList, "lastN": itemJson["lastN"]};
-    }catch(e){
+    } catch (e) {
       print(e.toString());
-    }}
-
-  /**
-   * Inserts the [Item] into the DB.
-   */
-  insertItem(Item item) async {
-    final itemRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/item',
-    );
-    String itemJson = jsonEncode(item.toJson());
-    final itemResponse = await _httpClient.put(itemRequest, body: itemJson, headers: {"Content-Type":"application/json"});
-    if (itemResponse.statusCode != 201) {
-      throw Exception(itemResponse.body);
     }
-    final decodedResponse = jsonDecode(
-        itemResponse.body
-    );
-    return decodedResponse ["upsertedId"];
-
   }
 
   /**
-   * Inserts the [Item] into the DB.
+   * Inserts the [ItemDTOReceive] into the DB.
    */
-  updateItem(Item item) async {
+  insertItem(ItemDTOSend item) async {
     final itemRequest = Uri.https(
       _baseUrl,
       '/api/v1/bl_objects/item',
     );
     String itemJson = jsonEncode(item.toJson());
-    final itemResponse = await _httpClient.put(itemRequest, body: itemJson, headers: {"Content-Type":"application/json"});
+    final itemResponse = await _httpClient.put(itemRequest,
+        body: itemJson, headers: {"Content-Type": "application/json"});
+    if (itemResponse.statusCode != 201) {
+      throw Exception(itemResponse.body);
+    }
+    final decodedResponse = jsonDecode(itemResponse.body);
+    return decodedResponse["upsertedId"];
+  }
+
+  /**
+   * Inserts the [ItemDTOReceive] into the DB.
+   */
+  updateItem(ItemDTOReceive item) async {
+    final itemRequest = Uri.https(
+      _baseUrl,
+      '/api/v1/bl_objects/item',
+    );
+    String itemJson = jsonEncode(item.toJson());
+    final itemResponse = await _httpClient.put(itemRequest,
+        body: itemJson, headers: {"Content-Type": "application/json"});
     if (itemResponse.statusCode != 200) {
       throw Exception(itemResponse.body);
     }
 
-    final responseJson = jsonDecode(
-        itemResponse.body
-    );
+    final responseJson = jsonDecode(itemResponse.body);
     final bool updated = responseJson["modifiedCount"] == 1;
-    if(!updated){
+    if (!updated) {
       throw new Exception('No items updated');
     }
   }

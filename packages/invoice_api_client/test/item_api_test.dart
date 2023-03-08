@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:invoice_api_client/invoice_api_client.dart';
+import 'package:invoice_api_client/items/models/itemDTOSend.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -10,7 +11,9 @@ class MockHttpClient extends Mock implements http.Client {}
 
 class MockResponse extends Mock implements http.Response {}
 
-class MockItem extends Mock implements Item {}
+class MockItemDTOReceive extends Mock implements ItemDTOReceive {}
+
+class MockItemDTOSend extends Mock implements ItemDTOSend {}
 
 class FakeUri extends Fake implements Uri {}
 
@@ -34,8 +37,6 @@ void main() {
       });
     });
 
-
-
     group('item update', () {
       test('makes correct http request', () async {
         final response = MockResponse();
@@ -47,23 +48,23 @@ void main() {
     "upsertedCount": 0,
     "matchedCount": 1
 }''');
-        when(() => httpClient.put(any(), body: {})).thenAnswer((_) async => response);
-        Item fakeItem = MockItem();
+        when(() => httpClient.put(any(), body: {}))
+            .thenAnswer((_) async => response);
+        ItemDTOSend fakeItem = MockItemDTOSend();
         when(fakeItem.toJson).thenReturn({});
         final body = jsonEncode(fakeItem.toJson());
         try {
           await itemApiClient.insertItem(fakeItem);
         } catch (_) {}
         verify(
-              () => httpClient.put(
+          () => httpClient.put(
               Uri.https(
                 'us-central1-invoice-c63dc.cloudfunctions.net',
                 '/api/v1/bl_objects/item',
               ),
-                  headers: {"Content-Type": "application/json"},
-                  body: body,
-                  encoding: null
-          ),
+              headers: {"Content-Type": "application/json"},
+              body: body,
+              encoding: null),
         ).called(1);
       });
 
@@ -77,13 +78,15 @@ void main() {
     "upsertedCount": 0,
     "matchedCount": 1
 }''');
-        Item fakeItem = MockItem();
+        ItemDTOReceive fakeItem = MockItemDTOReceive();
         when(fakeItem.toJson).thenReturn({});
         final body = jsonEncode(fakeItem.toJson());
 
-        when(() => httpClient.put(any(), body: body, headers: {"Content-Type":"application/json"})).thenAnswer((_) async => response);
+        when(() => httpClient.put(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
         expect(
-              () async => itemApiClient.updateItem(fakeItem),
+          () async => itemApiClient.updateItem(fakeItem),
           throwsA(isA<Exception>()),
         );
       });
@@ -94,18 +97,19 @@ void main() {
         when(() => response.body).thenReturn('''{
     "error on updating item"
 }''');
-        Item fakeItem = MockItem();
+        ItemDTOReceive fakeItem = MockItemDTOReceive();
         when(fakeItem.toJson).thenReturn({});
         final body = jsonEncode(fakeItem.toJson());
 
-        when(() => httpClient.put(any(),body: body,headers: {"Content-Type":"application/json"})).thenAnswer((_) async => response);
+        when(() => httpClient.put(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
         expect(
-              () async => itemApiClient.updateItem(fakeItem),
+          () async => itemApiClient.updateItem(fakeItem),
           throwsA(isA<Exception>()),
         );
       });
-    }
-    );
+    });
 
     group('item insert', () {
       test('makes correct http request', () async {
@@ -116,21 +120,20 @@ void main() {
         "insertedId": "62e393a5fb12b967fea3d9d0"
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-        Item fakeItem = MockItem();
+        ItemDTOSend fakeItem = MockItemDTOSend();
         when(fakeItem.toJson).thenReturn({});
         final body = jsonEncode(fakeItem.toJson());
         try {
           await itemApiClient.insertItem(fakeItem);
         } catch (_) {}
         verify(
-              () => httpClient.put(
+          () => httpClient.put(
               Uri.https(
                 'us-central1-invoice-c63dc.cloudfunctions.net',
                 '/api/v1/bl_objects/item',
               ),
               body: body,
-                  headers: {"Content-Type": "application/json"}
-              ),
+              headers: {"Content-Type": "application/json"}),
         ).called(1);
       });
       test('inserts item, id gets extracted correctly', () async {
@@ -140,10 +143,12 @@ void main() {
         "acknowledged": true,
         "insertedId": "62e393a5fb12b967fea3d9d0"
 }''');
-        Item fakeItem = MockItem();
+        ItemDTOSend fakeItem = MockItemDTOSend();
         when(fakeItem.toJson).thenReturn({});
         final body = jsonEncode(fakeItem.toJson());
-        when(() => httpClient.post(any(), body: body, headers: {"Content-Type": "application/json"})).thenAnswer((_) async => response);
+        when(() => httpClient.post(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
 
         String id = "62e393a5fb12b967fea3d9d0";
         try {
@@ -158,17 +163,18 @@ void main() {
         when(() => response.body).thenReturn('''{
     "error on inserting item"
 }''');
-        Item fakeItem = MockItem();
+        ItemDTOSend fakeItem = MockItemDTOSend();
         when(fakeItem.toJson).thenReturn({});
         final body = jsonEncode(fakeItem.toJson());
-        when(() => httpClient.put(any(),body: body, headers: {"Content-Type": "application/json"} )).thenAnswer((_) async => response);
+        when(() => httpClient.put(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
         expect(
-              () async => itemApiClient.insertItem(fakeItem),
+          () async => itemApiClient.insertItem(fakeItem),
           throwsA(isA<Exception>()),
         );
       });
-    }
-    );
+    });
 
     group('itemSearch', () {
       const id = 'mock-query';
@@ -181,11 +187,9 @@ void main() {
           await itemApiClient.getItemById(id);
         } catch (_) {}
         verify(
-              () => httpClient.get(
-            Uri.https(
-              'us-central1-invoice-c63dc.cloudfunctions.net',
-              '/api/v1/bl_objects/item/$id'
-            ),
+          () => httpClient.get(
+            Uri.https('us-central1-invoice-c63dc.cloudfunctions.net',
+                '/api/v1/bl_objects/item/$id'),
           ),
         ).called(1);
       });
@@ -199,19 +203,15 @@ void main() {
           await itemApiClient.getItems({});
         } catch (_) {}
         verify(
-              () => httpClient.get(
-            Uri.https(
-              'us-central1-invoice-c63dc.cloudfunctions.net',
-              '/api/v1/bl_objects/item',
-              {}
-            ),
+          () => httpClient.get(
+            Uri.https('us-central1-invoice-c63dc.cloudfunctions.net',
+                '/api/v1/bl_objects/item', {}),
           ),
         ).called(1);
       });
 
-
-
-      test('getItemById throws ItemIdRequestFailure on non-200 response', () async {
+      test('getItemById throws ItemIdRequestFailure on non-200 response',
+          () async {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(400);
         when(() => response.body).thenReturn('''{
@@ -219,7 +219,7 @@ void main() {
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         expect(
-              () async => itemApiClient.getItemById(id),
+          () async => itemApiClient.getItemById(id),
           throwsA(isA<ItemIdRequestFailure>()),
         );
       });
@@ -232,7 +232,7 @@ void main() {
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         expect(
-              () async => itemApiClient.getItems({}),
+          () async => itemApiClient.getItems({}),
           throwsA(isA<Exception>()),
         );
       });
@@ -262,17 +262,20 @@ void main() {
         final actual = await itemApiClient.getItemById(id);
         expect(
           actual,
-          isA<Item>()
+          isA<ItemDTOReceive>()
               .having((l) => l.title, 'title', 'abcefghijklmnopqrstuvwxyztest')
               .having((l) => l.id, 'id', '62e393a5fb12b967fea3d9d0')
               .having((l) => l.userId, 'userId', '62e393a5fb12b967fea3d9d0')
-              .having((l) => l.description, 'description', 'Bricks for construction')
+              .having((l) => l.description, 'description',
+                  'Bricks for construction')
               .having((l) => l.pricePerUnit, 'pricePerUnit', 17.625)
               .having((l) => l.tax, 'tax', 0.19)
               .having((l) => l.discount, 'discount', 0.02)
               .having((l) => l.taxIncluded, 'taxIncluded', true)
-              .having((l) => l.creationDate, 'creationDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.modifiedDate, 'modifiedDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.creationDate, 'creationDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.modifiedDate, 'modifiedDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
               .having((l) => l.taxedAmount, 'taxedAmount', 15),
         );
       });
@@ -305,17 +308,20 @@ void main() {
         print(actual);
         expect(
           actual["itemList"][0],
-          isA<Item>()
+          isA<ItemDTOReceive>()
               .having((l) => l.title, 'title', 'abcefghijklmnopqrstuvwxyztest')
               .having((l) => l.id, 'id', '62e393a5fb12b967fea3d9d0')
               .having((l) => l.userId, 'userId', '62e393a5fb12b967fea3d9d0')
-              .having((l) => l.description, 'description', 'Bricks for construction')
+              .having((l) => l.description, 'description',
+                  'Bricks for construction')
               .having((l) => l.pricePerUnit, 'pricePerUnit', 17.625)
               .having((l) => l.tax, 'tax', 0.19)
               .having((l) => l.discount, 'discount', 0.02)
               .having((l) => l.taxIncluded, 'taxIncluded', true)
-              .having((l) => l.creationDate, 'creationDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.modifiedDate, 'modifiedDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.creationDate, 'creationDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.modifiedDate, 'modifiedDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
               .having((l) => l.taxedAmount, 'taxedAmount', 15),
         );
       });

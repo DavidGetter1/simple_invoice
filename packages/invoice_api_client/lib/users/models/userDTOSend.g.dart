@@ -1,22 +1,33 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: implicit_dynamic_parameter
+
 part of 'userDTOSend.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-UserDTOSend _$UserDTOFromJson(Map<String, dynamic> json) => UserDTOSend(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      billingInformation: BillingInformation.fromJson(
-          json['billingInformation'] as Map<String, dynamic>),
-      locale: $enumDecode(_$LocaleEnumMap, json['locale']),
-      email: json['email'] as String,
-      hasPremium: json['hasPremium'] as bool,
+UserDTOSend _$UserDTOSendFromJson(Map<String, dynamic> json) => $checkedCreate(
+      'UserDTOSend',
+      json,
+      ($checkedConvert) {
+        final val = UserDTOSend(
+          id: $checkedConvert('id', (v) => v as String),
+          name: $checkedConvert('name', (v) => v as String),
+          billingInformation: $checkedConvert('billingInformation',
+              (v) => BillingInformation.fromJson(v as Map<String, dynamic>)),
+          locale:
+              $checkedConvert('locale', (v) => $enumDecode(_$LocaleEnumMap, v)),
+          email: $checkedConvert('email', (v) => v as String),
+          hasPremium: $checkedConvert('hasPremium', (v) => v as bool),
+        );
+        return val;
+      },
     );
 
-Map<String, dynamic> _$UserDTOToJson(UserDTOSend instance) => <String, dynamic>{
+Map<String, dynamic> _$UserDTOSendToJson(UserDTOSend instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'billingInformation': instance.billingInformation.toJson(),

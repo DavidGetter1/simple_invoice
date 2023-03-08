@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:authentication/authentication.dart';
 import 'package:bl_objects_repository/user/index.dart';
 import 'package:easyinvoice/authentication/authentication_event.dart';
@@ -16,7 +18,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       emit(AuthenticationLoading());
       try {
         final firebaseUser = await authenticationRepository.logInWithSocialLoginGoogle();
-        emit(AuthenticationAuthenticated(id: firebaseUser.uid));
+        emit(AuthenticationAuthenticated(id: firebaseUser.uid, callback: () => updateUserId(firebaseUser.uid)));
       } catch (error) {
         emit(AuthenticationFailure(error: error.toString()));
     }
@@ -25,7 +27,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       final isSignedIn = await authenticationRepository.isSignedIn();
       if (isSignedIn) {
         final firebaseUser = await authenticationRepository.getUser();
-        emit(AuthenticationAuthenticated(id: firebaseUser.uid));
+        emit(AuthenticationAuthenticated(id: firebaseUser.uid, callback: () => updateUserId(firebaseUser.uid)));
       } else {
         emit(AuthenticationUnauthenticated());
       }
@@ -34,7 +36,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       emit(AuthenticationLoading());
       try {
         final firebaseUser = await authenticationRepository.logInWithSocialLoginApple();
-        emit(AuthenticationAuthenticated(id: firebaseUser.uid));
+        emit(AuthenticationAuthenticated(id: firebaseUser.uid, callback: () => updateUserId(firebaseUser.uid)));
       } catch (error) {
         emit(AuthenticationFailure(error: error.toString()));
       }
@@ -49,4 +51,17 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       }
     });
   }
+
+  final _userIdController = StreamController<String>();
+
+  Stream<String> get UserId => _userIdController.stream;
+
+  void updateUserId(String newUserId) {
+    _userIdController.sink.add(newUserId);
+  }
+
+  void dispose() {
+    _userIdController.close();
+  }
+
 }

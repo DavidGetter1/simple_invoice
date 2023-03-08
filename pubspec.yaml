@@ -60,6 +60,9 @@ dependencies:
     path: packages/invoice_api_client
   authentication:
     path: packages/authentication
+  i18n_extension: ^5.0.1
+  flutter_localizations:
+    sdk: flutter
   # Simplifying the use of both Material and Cupertino widgets with a single widget
   #flutter_platform_widgets: ^1.20.0
 
