@@ -1,7 +1,6 @@
-
 part of 'item_cubit.dart';
 
-abstract class ItemState extends Equatable {
+class ItemState extends Equatable {
   const ItemState();
 
   @override
@@ -12,27 +11,11 @@ class InitialState extends ItemState {}
 
 class LoadingState extends ItemState {}
 
-class ItemDeletedState extends ItemState {}
-
-class ItemUpdatedState extends ItemState {}
-
 class NoMoreResultsState extends ItemState {}
-
-@JsonSerializable()
-class ItemCreatedState extends ItemState{
-
-  final String id;
-  const ItemCreatedState({required this.id});
-
-  factory ItemCreatedState.fromJson(Map<String, dynamic> json) =>
-      _$ItemCreatedStateFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ItemCreatedStateToJson(this);
-}
 
 @JsonSerializable(explicitToJson: true)
 class ItemFetchedState extends ItemState {
-  final ItemDTOReceive item;
+  final Item item;
   const ItemFetchedState({required this.item});
 
   factory ItemFetchedState.fromJson(Map<String, dynamic> json) =>
@@ -45,15 +28,14 @@ class ItemFetchedState extends ItemState {
 }
 
 @JsonSerializable(explicitToJson: true)
-class ItemListFetchedState extends ItemState {
-  final int lastN;
-  final List<ItemDTOReceive> itemList;
-  const ItemListFetchedState({required this.itemList, required this.lastN});
+class OperationCompletedState extends ItemState {
+  final List<Item> itemList;
+  const OperationCompletedState({required this.itemList});
 
-  factory ItemListFetchedState.fromJson(Map<String, dynamic> json) =>
-      _$ItemListFetchedStateFromJson(json);
+  factory OperationCompletedState.fromJson(Map<String, dynamic> json) =>
+      _$OperationCompletedStateFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ItemListFetchedStateToJson(this);
+  Map<String, dynamic> toJson() => _$OperationCompletedStateToJson(this);
 
   @override
   List<Object?> get props => [itemList];
@@ -69,4 +51,3 @@ class FailureState extends ItemState {
 
   Map<String, dynamic> toJson() => _$FailureStateToJson(this);
 }
-

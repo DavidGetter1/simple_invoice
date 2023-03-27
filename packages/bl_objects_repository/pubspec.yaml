@@ -14,6 +14,8 @@ dependencies:
   json_annotation: ^4.6.0
   invoice_api_client:
     path: ../invoice_api_client
+  authentication:
+    path: ../authentication
 
 dev_dependencies:
   flutter_test:

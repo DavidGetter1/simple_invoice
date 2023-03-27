@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:authentication/src/authentication_service.dart';
 import 'package:authentication/src/credential_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -10,15 +11,25 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'authentication_status.dart';
 
 class AuthenticationRepository {
+  FirebaseApp? app;
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
-  AuthenticationRepository({FirebaseAuth? firebaseAuth, GoogleSignIn? googleSignIn})
-      : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance, _googleSignIn = googleSignIn ?? GoogleSignIn();
+  AuthenticationRepository(
+      {FirebaseAuth? firebaseAuth, GoogleSignIn? googleSignIn})
+      : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+        _googleSignIn = googleSignIn ?? GoogleSignIn() {}
 
   final googleCredentialProvider = new GoogleCredentialProvider();
 
+  Stream<String> get userId {
+    return _firebaseAuth.authStateChanges().map((firebaseUser) {
+      print("firebaseUser: ${firebaseUser?.uid}");
+      return firebaseUser?.uid ?? "uninitialized";
+    }).asBroadcastStream();
+  }
+
   Future<bool> isSignedIn() async {
-    final currentUser = await _firebaseAuth.currentUser!;
+    final currentUser = await _firebaseAuth.currentUser;
     return currentUser != null;
   }
 
@@ -26,59 +37,67 @@ class AuthenticationRepository {
     return await _firebaseAuth.currentUser!;
   }
 
-  Future<User> logInWithSocialLoginGoogle([CredentialProvider? credentialProvider]) async {
-    if(credentialProvider == null){
+  Future<User> logInWithSocialLoginGoogle(
+      [CredentialProvider? credentialProvider]) async {
+    if (credentialProvider == null) {
       credentialProvider = new GoogleCredentialProvider();
     }
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
     if (googleUser == null) {
       throw new Error();
     }
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
 
     // nullable, because it might be theoretically null, however it wont be.
     AuthCredential? credential;
     // CredentialProvider is an abstract class which has subtypes for both google and
     // apple sign in.
-    if(credentialProvider is GoogleCredentialProvider){
-       credential = credentialProvider.credentialGoogle(
+    if (credentialProvider is GoogleCredentialProvider) {
+      credential = credentialProvider.credentialGoogle(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
     }
 
-    final UserCredential result = await _firebaseAuth.signInWithCredential(credential!);
+    final UserCredential result =
+        await _firebaseAuth.signInWithCredential(credential!);
     return result.user!;
   }
 
-  Future<User> logInWithSocialLoginApple([CredentialProvider? credentialProvider, OAuthProvider? oAuthProvider]) async {
-    if(credentialProvider == null){
+  Future<User> logInWithSocialLoginApple(
+      [CredentialProvider? credentialProvider,
+      OAuthProvider? oAuthProvider]) async {
+    if (credentialProvider == null) {
       credentialProvider = new AppleCredentialProvider();
     }
-    if(oAuthProvider == null){
+    if (oAuthProvider == null) {
       oAuthProvider = new OAuthProvider("apple.com");
     }
     // nullable, because it might be theoretically null, however it wont be.
     AuthorizationCredentialAppleID? appleIdCredential;
 
-    if(credentialProvider is AppleCredentialProvider){
+    if (credentialProvider is AppleCredentialProvider) {
       appleIdCredential = await credentialProvider.credentialApple(
         email: AppleIDAuthorizationScopes.email,
         fullName: AppleIDAuthorizationScopes.fullName,
       );
     }
 
-
     OAuthCredential? credential;
-    if(credentialProvider is AppleCredentialProvider) {
-      credential = credentialProvider.oAuthCredential(identityToken: appleIdCredential!.identityToken, authorizationCode: appleIdCredential.authorizationCode, provider: oAuthProvider);
+    if (credentialProvider is AppleCredentialProvider) {
+      credential = credentialProvider.oAuthCredential(
+          identityToken: appleIdCredential!.identityToken,
+          authorizationCode: appleIdCredential.authorizationCode,
+          provider: oAuthProvider);
     }
-    final UserCredential result = await _firebaseAuth.signInWithCredential(credential!);
+    final UserCredential result =
+        await _firebaseAuth.signInWithCredential(credential!);
     return result.user!;
   }
 
   void logOut() async {
-    return await _firebaseAuth.signOut();
+    await _firebaseAuth.signOut();
   }
 }
 

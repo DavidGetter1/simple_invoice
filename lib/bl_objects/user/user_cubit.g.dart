@@ -18,20 +18,18 @@ Map<String, dynamic> _$UserCreatedStateToJson(UserCreatedState instance) =>
 
 UserFetchedState _$UserFetchedStateFromJson(Map<String, dynamic> json) =>
     UserFetchedState(
-      user: User.fromJson(json['user'] as Map<String, dynamic>),
+      user: json['user'],
     );
 
 Map<String, dynamic> _$UserFetchedStateToJson(UserFetchedState instance) =>
     <String, dynamic>{
-      'user': instance.user.toJson(),
+      'user': instance.user,
     };
 
 UserListFetchedState _$UserListFetchedStateFromJson(
         Map<String, dynamic> json) =>
     UserListFetchedState(
-      userList: (json['userList'] as List<dynamic>)
-          .map((e) => User.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      userList: json['userList'] as List<User>,
       lastN: json['lastN'] as int,
     );
 
@@ -39,7 +37,7 @@ Map<String, dynamic> _$UserListFetchedStateToJson(
         UserListFetchedState instance) =>
     <String, dynamic>{
       'lastN': instance.lastN,
-      'userList': instance.userList.map((e) => e.toJson()).toList(),
+      'userList': instance.userList,
     };
 
 FailureState _$FailureStateFromJson(Map<String, dynamic> json) => FailureState(

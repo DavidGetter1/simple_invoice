@@ -30,16 +30,14 @@ class InvoiceApiClient {
       '/api/v1/bl_objects/invoice/$id',
     );
     final invoiceResponse = await _httpClient.delete(invoiceRequest);
-  print(invoiceResponse.body);
+    print(invoiceResponse.body);
     if (invoiceResponse.statusCode != 200) {
       throw Exception(invoiceResponse.body);
     }
 
-    final invoiceJson = jsonDecode(
-        invoiceResponse.body
-    );
+    final invoiceJson = jsonDecode(invoiceResponse.body);
 
-    if(invoiceJson["deletedCount"] != 1){
+    if (invoiceJson["deletedCount"] != 1) {
       throw new Exception('No invoices deleted');
     }
   }
@@ -51,7 +49,7 @@ class InvoiceApiClient {
     print("fetching");
     final invoiceRequest = Uri.https(
       _baseUrl,
-        '/api/v1/bl_objects/invoice/$id',
+      '/api/v1/bl_objects/invoice/$id',
     );
     final invoiceResponse = await _httpClient.get(invoiceRequest);
 
@@ -59,88 +57,84 @@ class InvoiceApiClient {
       throw InvoiceIdRequestFailure(invoiceResponse.body.toString());
     }
 
-    final invoiceJson = jsonDecode(
-      invoiceResponse.body
-    );
+    final invoiceJson = jsonDecode(invoiceResponse.body);
 
-    if(invoiceJson == {}){
+    if (invoiceJson == {}) {
       throw new Exception('No invoices found');
     }
 
-    try{
-    Invoice invoice = Invoice.fromJson(invoiceJson as Map<String, dynamic>);
-    return invoice;
-  }catch(e){
-    print(e.toString());
-    }}
+    try {
+      InvoiceDTO invoice =
+          InvoiceDTO.fromJson(invoiceJson as Map<String, dynamic>);
+      return invoice;
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   /**
    * Queries the DB for invoices.
    */
   dynamic getInvoices(Map<String, String> query) async {
     jsonEncode(query);
-    final invoiceRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/invoice',
-      query
-    );
+    final invoiceRequest =
+        Uri.https(_baseUrl, '/api/v1/bl_objects/invoice', query);
     final invoiceResponse = await _httpClient.get(invoiceRequest);
     if (invoiceResponse.statusCode != 200) {
       throw new Exception(invoiceResponse.body);
     }
 
-    final invoiceJson = jsonDecode(
-        invoiceResponse.body
-    );
-    if(invoiceJson["data"].isEmpty){
+    final invoiceJson = jsonDecode(invoiceResponse.body);
+    if (invoiceJson["data"].isEmpty) {
       throw new Exception('No invoices found');
     }
-    try{
-      List<Invoice> invoiceList = List<Invoice>.from(invoiceJson["data"].map((invoice) => Invoice.fromJson(invoice)).toList());
+    try {
+      List<InvoiceDTO> invoiceList = List<InvoiceDTO>.from(invoiceJson["data"]
+          .map((invoice) => InvoiceDTO.fromJson(invoice))
+          .toList());
       return {"invoiceList": invoiceList, "lastN": invoiceJson["lastN"]};
-    }catch(e){
+    } catch (e) {
       print(e.toString());
-    }}
-
-  /**
-   * Inserts the [Invoice] into the DB.
-   */
-  insertInvoice(Invoice invoice) async {
-    final invoiceRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/invoice',
-    );
-    String invoiceJson = jsonEncode(invoice.toJson());
-    final invoiceResponse = await _httpClient.put(invoiceRequest, body: invoiceJson, headers: {"Content-Type":"application/json"});
-    print(invoiceResponse.body);
-    if (invoiceResponse.statusCode != 201) {
-      throw Exception(invoiceResponse.body);
     }
-    final decodedResponse = jsonDecode(
-        invoiceResponse.body
-    );
-    return decodedResponse ["upsertedId"];
   }
 
   /**
    * Inserts the [Invoice] into the DB.
    */
-  updateInvoice(Invoice invoice) async {
+  insertInvoice(InvoiceDTO invoice) async {
     final invoiceRequest = Uri.https(
       _baseUrl,
       '/api/v1/bl_objects/invoice',
     );
     String invoiceJson = jsonEncode(invoice.toJson());
-    final invoiceResponse = await _httpClient.put(invoiceRequest, body: invoiceJson, headers: {"Content-Type":"application/json"});
+    final invoiceResponse = await _httpClient.put(invoiceRequest,
+        body: invoiceJson, headers: {"Content-Type": "application/json"});
+    print(invoiceResponse.body);
+    if (invoiceResponse.statusCode != 201) {
+      throw Exception(invoiceResponse.body);
+    }
+    final decodedResponse = jsonDecode(invoiceResponse.body);
+    return decodedResponse["upsertedId"];
+  }
+
+  /**
+   * Inserts the [Invoice] into the DB.
+   */
+  updateInvoice(InvoiceDTO invoice) async {
+    final invoiceRequest = Uri.https(
+      _baseUrl,
+      '/api/v1/bl_objects/invoice',
+    );
+    String invoiceJson = jsonEncode(invoice.toJson());
+    final invoiceResponse = await _httpClient.put(invoiceRequest,
+        body: invoiceJson, headers: {"Content-Type": "application/json"});
     if (invoiceResponse.statusCode != 200) {
       throw Exception(invoiceResponse.body);
     }
 
-    final responseJson = jsonDecode(
-        invoiceResponse.body
-    );
+    final responseJson = jsonDecode(invoiceResponse.body);
     final bool updated = responseJson["modifiedCount"] == 1;
-    if(!updated){
+    if (!updated) {
       throw new Exception('No invoices updated');
     }
   }

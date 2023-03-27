@@ -1,13 +1,13 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:invoice_api_client/clients/models/client.dart';
 import 'package:unicons/unicons.dart';
 import '../../i18n/client_screen.i18n.dart';
 
 class ClientListTile extends StatelessWidget {
-  const ClientListTile({
-    Key? key
-  }) : super(key: key);
+  final Client client;
+  const ClientListTile({Key? key, required this.client}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +27,16 @@ class ClientListTile extends StatelessWidget {
           width: 60,
           height: 60,
           alignment: Alignment.center,
-          child: Text("Ma", style: Theme.of(context).textTheme.headline5,),
+          child: Text(
+            "Ma",
+            style: Theme.of(context).textTheme.headline5,
+          ),
           decoration: BoxDecoration(
               color: Colors.grey.withOpacity(0.2),
               borderRadius: BorderRadius.circular(24)),
         ),
-        title: const Text(
-          "Max Mustermann",
+        title: Text(
+          client.name,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text("Last invoice".i18n + ": 05.06.2022"),

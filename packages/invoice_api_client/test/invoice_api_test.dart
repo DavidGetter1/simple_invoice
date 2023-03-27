@@ -10,7 +10,7 @@ class MockHttpClient extends Mock implements http.Client {}
 
 class MockResponse extends Mock implements http.Response {}
 
-class MockInvoice extends Mock implements Invoice {}
+class MockInvoiceDTO extends Mock implements InvoiceDTO {}
 
 class FakeUri extends Fake implements Uri {}
 
@@ -34,8 +34,6 @@ void main() {
       });
     });
 
-
-
     group('invoice update', () {
       test('makes correct http request', () async {
         final response = MockResponse();
@@ -47,23 +45,23 @@ void main() {
     "upsertedCount": 0,
     "matchedCount": 1
 }''');
-        when(() => httpClient.put(any(), body: {})).thenAnswer((_) async => response);
-        Invoice fakeInvoice = MockInvoice();
-        when(fakeInvoice.toJson).thenReturn({});
-        final body = jsonEncode(fakeInvoice.toJson());
+        when(() => httpClient.put(any(), body: {}))
+            .thenAnswer((_) async => response);
+        InvoiceDTO fakeInvoiceDTO = MockInvoiceDTO();
+        when(fakeInvoiceDTO.toJson).thenReturn({});
+        final body = jsonEncode(fakeInvoiceDTO.toJson());
         try {
-          await invoiceApiClient.insertInvoice(fakeInvoice);
+          await invoiceApiClient.insertInvoice(fakeInvoiceDTO);
         } catch (_) {}
         verify(
-              () => httpClient.put(
+          () => httpClient.put(
               Uri.https(
                 'us-central1-invoice-c63dc.cloudfunctions.net',
                 '/api/v1/bl_objects/invoice',
               ),
               headers: {"Content-Type": "application/json"},
               body: body,
-              encoding: null
-          ),
+              encoding: null),
         ).called(1);
       });
 
@@ -77,13 +75,15 @@ void main() {
     "upsertedCount": 0,
     "matchedCount": 1
 }''');
-        Invoice fakeInvoice = MockInvoice();
-        when(fakeInvoice.toJson).thenReturn({});
-        final body = jsonEncode(fakeInvoice.toJson());
+        InvoiceDTO fakeInvoiceDTO = MockInvoiceDTO();
+        when(fakeInvoiceDTO.toJson).thenReturn({});
+        final body = jsonEncode(fakeInvoiceDTO.toJson());
 
-        when(() => httpClient.put(any(), body: body, headers: {"Content-Type":"application/json"})).thenAnswer((_) async => response);
+        when(() => httpClient.put(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
         expect(
-              () async => invoiceApiClient.updateInvoice(fakeInvoice),
+          () async => invoiceApiClient.updateInvoice(fakeInvoiceDTO),
           throwsA(isA<Exception>()),
         );
       });
@@ -94,18 +94,19 @@ void main() {
         when(() => response.body).thenReturn('''{
     "error on updating invoice"
 }''');
-        Invoice fakeInvoice = MockInvoice();
-        when(fakeInvoice.toJson).thenReturn({});
-        final body = jsonEncode(fakeInvoice.toJson());
+        InvoiceDTO fakeInvoiceDTO = MockInvoiceDTO();
+        when(fakeInvoiceDTO.toJson).thenReturn({});
+        final body = jsonEncode(fakeInvoiceDTO.toJson());
 
-        when(() => httpClient.put(any(),body: body,headers: {"Content-Type":"application/json"})).thenAnswer((_) async => response);
+        when(() => httpClient.put(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
         expect(
-              () async => invoiceApiClient.updateInvoice(fakeInvoice),
+          () async => invoiceApiClient.updateInvoice(fakeInvoiceDTO),
           throwsA(isA<Exception>()),
         );
       });
-    }
-    );
+    });
 
     group('invoice insert', () {
       test('makes correct http request', () async {
@@ -116,21 +117,20 @@ void main() {
         "insertedId": "62e393a5fb12b967fea3d9d0"
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-        Invoice fakeInvoice = MockInvoice();
-        when(fakeInvoice.toJson).thenReturn({});
-        final body = jsonEncode(fakeInvoice.toJson());
+        InvoiceDTO fakeInvoiceDTO = MockInvoiceDTO();
+        when(fakeInvoiceDTO.toJson).thenReturn({});
+        final body = jsonEncode(fakeInvoiceDTO.toJson());
         try {
-          await invoiceApiClient.insertInvoice(fakeInvoice);
+          await invoiceApiClient.insertInvoice(fakeInvoiceDTO);
         } catch (_) {}
         verify(
-              () => httpClient.put(
+          () => httpClient.put(
               Uri.https(
                 'us-central1-invoice-c63dc.cloudfunctions.net',
                 '/api/v1/bl_objects/invoice',
               ),
               body: body,
-              headers: {"Content-Type": "application/json"}
-          ),
+              headers: {"Content-Type": "application/json"}),
         ).called(1);
       });
       test('inserts invoice, id gets extracted correctly', () async {
@@ -140,14 +140,16 @@ void main() {
         "acknowledged": true,
         "insertedId": "62e393a5fb12b967fea3d9d0"
 }''');
-        Invoice fakeInvoice = MockInvoice();
-        when(fakeInvoice.toJson).thenReturn({});
-        final body = jsonEncode(fakeInvoice.toJson());
-        when(() => httpClient.post(any(), body: body, headers: {"Content-Type": "application/json"})).thenAnswer((_) async => response);
+        InvoiceDTO fakeInvoiceDTO = MockInvoiceDTO();
+        when(fakeInvoiceDTO.toJson).thenReturn({});
+        final body = jsonEncode(fakeInvoiceDTO.toJson());
+        when(() => httpClient.post(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
 
         String id = "62e393a5fb12b967fea3d9d0";
         try {
-          id = await invoiceApiClient.insertInvoice(fakeInvoice);
+          id = await invoiceApiClient.insertInvoice(fakeInvoiceDTO);
         } catch (_) {}
         expect(id, "62e393a5fb12b967fea3d9d0");
       });
@@ -158,17 +160,18 @@ void main() {
         when(() => response.body).thenReturn('''{
     "error on inserting invoice"
 }''');
-        Invoice fakeInvoice = MockInvoice();
-        when(fakeInvoice.toJson).thenReturn({});
-        final body = jsonEncode(fakeInvoice.toJson());
-        when(() => httpClient.put(any(),body: body, headers: {"Content-Type": "application/json"} )).thenAnswer((_) async => response);
+        InvoiceDTO fakeInvoiceDTO = MockInvoiceDTO();
+        when(fakeInvoiceDTO.toJson).thenReturn({});
+        final body = jsonEncode(fakeInvoiceDTO.toJson());
+        when(() => httpClient.put(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
         expect(
-              () async => invoiceApiClient.insertInvoice(fakeInvoice),
+          () async => invoiceApiClient.insertInvoice(fakeInvoiceDTO),
           throwsA(isA<Exception>()),
         );
       });
-    }
-    );
+    });
 
     group('invoiceSearch', () {
       const id = 'mock-query';
@@ -181,16 +184,14 @@ void main() {
           await invoiceApiClient.getInvoiceById(id);
         } catch (_) {}
         verify(
-              () => httpClient.get(
-            Uri.https(
-                'us-central1-invoice-c63dc.cloudfunctions.net',
-                '/api/v1/bl_objects/invoice/$id'
-            ),
+          () => httpClient.get(
+            Uri.https('us-central1-invoice-c63dc.cloudfunctions.net',
+                '/api/v1/bl_objects/invoice/$id'),
           ),
         ).called(1);
       });
 
-      test('getInvoices makes correct http request', () async {
+      test('getInvoice makes correct http request', () async {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(200);
         when(() => response.body).thenReturn('{}');
@@ -199,19 +200,16 @@ void main() {
           await invoiceApiClient.getInvoices({});
         } catch (_) {}
         verify(
-              () => httpClient.get(
-            Uri.https(
-                'us-central1-invoice-c63dc.cloudfunctions.net',
-                '/api/v1/bl_objects/invoice',
-                {}
-            ),
+          () => httpClient.get(
+            Uri.https('us-central1-invoice-c63dc.cloudfunctions.net',
+                '/api/v1/bl_objects/invoice', {}),
           ),
         ).called(1);
       });
 
-
-
-      test('getInvoiceById throws InvoiceIdRequestFailure on non-200 response', () async {
+      test(
+          'getInvoiceById throws InvoiceDTOIdRequestFailure on non-200 response',
+          () async {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(400);
         when(() => response.body).thenReturn('''{
@@ -219,12 +217,12 @@ void main() {
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         expect(
-              () async => invoiceApiClient.getInvoiceById(id),
+          () async => invoiceApiClient.getInvoiceById(id),
           throwsA(isA<InvoiceIdRequestFailure>()),
         );
       });
 
-      test('getInvoices throws Exception on non-200 response', () async {
+      test('getInvoice throws Exception on non-200 response', () async {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(400);
         when(() => response.body).thenReturn('''{
@@ -232,19 +230,19 @@ void main() {
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         expect(
-              () async => invoiceApiClient.getInvoices({}),
+          () async => invoiceApiClient.getInvoices({}),
           throwsA(isA<Exception>()),
         );
       });
 
-      test('getInvoiceById returns Invoice on valid response', () async {
+      test('getInvoiceById returns InvoiceDTO on valid response', () async {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(200);
         when(() => response.body).thenReturn(
           '''
 {
     
-        "_id": "62e393a5fb12b967fea3d9d0",
+        "id": "62e393a5fb12b967fea3d9d0",
         "invoiceNumber": "abcefghijklmnopqrstuvwxyztest",
         "userId": "62e393a5fb12b967fea3d9d0",
         "itemList": [{
@@ -271,31 +269,41 @@ void main() {
         final actual = await invoiceApiClient.getInvoiceById(id);
         expect(
           actual,
-          isA<Invoice>()
-              .having((l) => l.invoiceNumber, 'invoiceNumber', 'abcefghijklmnopqrstuvwxyztest')
+          isA<InvoiceDTO>()
+              .having((l) => l.invoiceNumber, 'invoiceNumber',
+                  'abcefghijklmnopqrstuvwxyztest')
               .having((l) => l.id, 'id', '62e393a5fb12b967fea3d9d0')
               .having((l) => l.userId, 'userId', '62e393a5fb12b967fea3d9d0')
-              .having((l) => l.itemList, 'itemList', [DetailedItem(quantity: 3, quantityIdentifier: "kg", id: "id")])
+              .having((l) => l.itemList, 'itemList', [
+                DetailedItem(quantity: 3, quantityIdentifier: "kg", id: "id")
+              ])
               .having((l) => l.discount, 'discount', 0.19)
-              .having((l) => l.paymentInformation, 'paymentInformation', PaymentInformation(type: "type", details: "details"))
-              .having((l) => l.paymentAfterTaxAndDiscount, 'paymentAfterTaxAndDiscount', 34)
-              .having((l) => l.paymentDate, 'paymentDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.creationDate, 'creationDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.modifiedDate, 'modifiedDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.paymentInformation, 'paymentInformation',
+                  PaymentInformation(type: "type", details: "details"))
+              .having((l) => l.paymentAfterTaxAndDiscount,
+                  'paymentAfterTaxAndDiscount', 34)
+              .having((l) => l.paymentDate, 'paymentDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.creationDate, 'creationDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.modifiedDates, 'modifiedDates',
+                  [DateTime.parse("2022-08-11T09:12:11.524Z")])
               .having((l) => l.isPaid, 'isPaid', true)
-              .having((l) => l.deliveryDate, 'deliveryDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.clientId, 'clientId', '62e393a5fb12b967fea3d9d0'),
+              .having((l) => l.deliveryDate, 'deliveryDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having(
+                  (l) => l.clientId, 'clientId', '62e393a5fb12b967fea3d9d0'),
         );
       });
 
-      test('getInvoices returns list of invoices on valid response', () async {
+      test('getInvoice returns list of invoices on valid response', () async {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(200);
         when(() => response.body).thenReturn(
           '''
 {
     "data": [{
-        "_id": "62e393a5fb12b967fea3d9d0",
+        "id": "62e393a5fb12b967fea3d9d0",
         "invoiceNumber": "abcefghijklmnopqrstuvwxyztest",
         "userId": "62e393a5fb12b967fea3d9d0",
         "itemList": [{
@@ -325,20 +333,30 @@ void main() {
         print(actual);
         expect(
           actual["invoiceList"][0],
-          isA<Invoice>()
-              .having((l) => l.invoiceNumber, 'invoiceNumber', 'abcefghijklmnopqrstuvwxyztest')
+          isA<InvoiceDTO>()
+              .having((l) => l.invoiceNumber, 'invoiceNumber',
+                  'abcefghijklmnopqrstuvwxyztest')
               .having((l) => l.id, 'id', '62e393a5fb12b967fea3d9d0')
               .having((l) => l.userId, 'userId', '62e393a5fb12b967fea3d9d0')
-              .having((l) => l.itemList, 'itemList', [DetailedItem(quantity: 3, quantityIdentifier: "kg", id: "id")])
+              .having((l) => l.itemList, 'itemList', [
+                DetailedItem(quantity: 3, quantityIdentifier: "kg", id: "id")
+              ])
               .having((l) => l.discount, 'discount', 0.19)
-              .having((l) => l.paymentInformation, 'paymentInformation', PaymentInformation(type: "type", details: "details"))
-              .having((l) => l.paymentAfterTaxAndDiscount, 'paymentAfterTaxAndDiscount', 34)
-              .having((l) => l.paymentDate, 'paymentDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.creationDate, 'creationDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.modifiedDate, 'modifiedDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.paymentInformation, 'paymentInformation',
+                  PaymentInformation(type: "type", details: "details"))
+              .having((l) => l.paymentAfterTaxAndDiscount,
+                  'paymentAfterTaxAndDiscount', 34)
+              .having((l) => l.paymentDate, 'paymentDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.creationDate, 'creationDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.modifiedDates, 'modifiedDates',
+                  [DateTime.parse("2022-08-11T09:12:11.524Z")])
               .having((l) => l.isPaid, 'isPaid', true)
-              .having((l) => l.deliveryDate, 'deliveryDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.clientId, 'clientId', '62e393a5fb12b967fea3d9d0'),
+              .having((l) => l.deliveryDate, 'deliveryDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having(
+                  (l) => l.clientId, 'clientId', '62e393a5fb12b967fea3d9d0'),
         );
       });
     });

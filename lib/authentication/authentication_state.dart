@@ -1,4 +1,3 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -14,8 +13,7 @@ class AuthenticationUninitialized extends AuthenticationState {
 class AuthenticationAuthenticated extends AuthenticationState {
   final String id;
 
-  AuthenticationAuthenticated({required this.id, required Function callback})
-      : assert(id != null){callback();}
+  AuthenticationAuthenticated({required this.id}) : assert(id != null) {}
 
   @override
   List<Object> get props => [id];

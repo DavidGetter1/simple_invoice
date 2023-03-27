@@ -34,8 +34,6 @@ void main() {
       });
     });
 
-
-
     group('client update', () {
       test('makes correct http request', () async {
         final response = MockResponse();
@@ -47,7 +45,8 @@ void main() {
     "upsertedCount": 0,
     "matchedCount": 1
 }''');
-        when(() => httpClient.put(any(), body: {})).thenAnswer((_) async => response);
+        when(() => httpClient.put(any(), body: {}))
+            .thenAnswer((_) async => response);
         Client fakeClient = MockClient();
         when(fakeClient.toJson).thenReturn({});
         final body = jsonEncode(fakeClient.toJson());
@@ -55,15 +54,14 @@ void main() {
           await clientApiClient.insertClient(fakeClient);
         } catch (_) {}
         verify(
-              () => httpClient.put(
+          () => httpClient.put(
               Uri.https(
                 'us-central1-invoice-c63dc.cloudfunctions.net',
                 '/api/v1/bl_objects/client',
               ),
-                  headers: {"Content-Type": "application/json"},
-                  body: body,
-                  encoding: null
-          ),
+              headers: {"Content-Type": "application/json"},
+              body: body,
+              encoding: null),
         ).called(1);
       });
 
@@ -81,9 +79,11 @@ void main() {
         when(fakeClient.toJson).thenReturn({});
         final body = jsonEncode(fakeClient.toJson());
 
-        when(() => httpClient.put(any(), body: body, headers: {"Content-Type":"application/json"})).thenAnswer((_) async => response);
+        when(() => httpClient.put(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
         expect(
-              () async => clientApiClient.updateClient(fakeClient),
+          () async => clientApiClient.updateClient(fakeClient),
           throwsA(isA<Exception>()),
         );
       });
@@ -98,14 +98,15 @@ void main() {
         when(fakeClient.toJson).thenReturn({});
         final body = jsonEncode(fakeClient.toJson());
 
-        when(() => httpClient.put(any(),body: body,headers: {"Content-Type":"application/json"})).thenAnswer((_) async => response);
+        when(() => httpClient.put(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
         expect(
-              () async => clientApiClient.updateClient(fakeClient),
+          () async => clientApiClient.updateClient(fakeClient),
           throwsA(isA<Exception>()),
         );
       });
-    }
-    );
+    });
 
     group('client insert', () {
       test('makes correct http request', () async {
@@ -123,14 +124,13 @@ void main() {
           await clientApiClient.insertClient(fakeClient);
         } catch (_) {}
         verify(
-              () => httpClient.put(
+          () => httpClient.put(
               Uri.https(
                 'us-central1-invoice-c63dc.cloudfunctions.net',
                 '/api/v1/bl_objects/client',
               ),
               body: body,
-                  headers: {"Content-Type": "application/json"}
-              ),
+              headers: {"Content-Type": "application/json"}),
         ).called(1);
       });
       test('inserts client, id gets extracted correctly', () async {
@@ -143,7 +143,9 @@ void main() {
         Client fakeClient = MockClient();
         when(fakeClient.toJson).thenReturn({});
         final body = jsonEncode(fakeClient.toJson());
-        when(() => httpClient.post(any(), body: body, headers: {"Content-Type": "application/json"})).thenAnswer((_) async => response);
+        when(() => httpClient.post(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
 
         String id = "62e393a5fb12b967fea3d9d0";
         try {
@@ -161,14 +163,15 @@ void main() {
         Client fakeClient = MockClient();
         when(fakeClient.toJson).thenReturn({});
         final body = jsonEncode(fakeClient.toJson());
-        when(() => httpClient.put(any(),body: body, headers: {"Content-Type": "application/json"} )).thenAnswer((_) async => response);
+        when(() => httpClient.put(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
         expect(
-              () async => clientApiClient.insertClient(fakeClient),
+          () async => clientApiClient.insertClient(fakeClient),
           throwsA(isA<Exception>()),
         );
       });
-    }
-    );
+    });
 
     group('clientSearch', () {
       const id = 'mock-query';
@@ -181,11 +184,9 @@ void main() {
           await clientApiClient.getClientById(id);
         } catch (_) {}
         verify(
-              () => httpClient.get(
-            Uri.https(
-              'us-central1-invoice-c63dc.cloudfunctions.net',
-              '/api/v1/bl_objects/client/$id'
-            ),
+          () => httpClient.get(
+            Uri.https('us-central1-invoice-c63dc.cloudfunctions.net',
+                '/api/v1/bl_objects/client/$id'),
           ),
         ).called(1);
       });
@@ -199,19 +200,15 @@ void main() {
           await clientApiClient.getClients({});
         } catch (_) {}
         verify(
-              () => httpClient.get(
-            Uri.https(
-              'us-central1-invoice-c63dc.cloudfunctions.net',
-              '/api/v1/bl_objects/client',
-              {}
-            ),
+          () => httpClient.get(
+            Uri.https('us-central1-invoice-c63dc.cloudfunctions.net',
+                '/api/v1/bl_objects/client', {}),
           ),
         ).called(1);
       });
 
-
-
-      test('getClientById throws ClientIdRequestFailure on non-200 response', () async {
+      test('getClientById throws ClientIdRequestFailure on non-200 response',
+          () async {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(400);
         when(() => response.body).thenReturn('''{
@@ -219,7 +216,7 @@ void main() {
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         expect(
-              () async => clientApiClient.getClientById(id),
+          () async => clientApiClient.getClientById(id),
           throwsA(isA<ClientIdRequestFailure>()),
         );
       });
@@ -232,7 +229,7 @@ void main() {
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         expect(
-              () async => clientApiClient.getClients({}),
+          () async => clientApiClient.getClients({}),
           throwsA(isA<Exception>()),
         );
       });
@@ -243,8 +240,7 @@ void main() {
         when(() => response.body).thenReturn(
           '''
 {
-    
-        "_id": "62e393a5fb12b967fea3d9d0",
+        "id": "62e393a5fb12b967fea3d9d0",
         "userId": "62e393a5fb12b967fea3d9d0",
         "name": "abcefghijklmnopqrstuvwxyztest",
         "city": "hamburg",
@@ -256,11 +252,11 @@ void main() {
         "creationDate": "2022-08-11T09:12:11.524Z",
         "modifiedDate": "2022-08-11T09:12:11.524Z",
         "email": "erna@bert.de"
-    
 }''',
         );
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         final actual = await clientApiClient.getClientById(id);
+
         expect(
           actual,
           isA<Client>()
@@ -272,8 +268,10 @@ void main() {
               .having((l) => l.streetName, 'streetName', "washingtonallee")
               .having((l) => l.streetNumber, 'streetNumber', "13a")
               .having((l) => l.phoneNumber, 'phoneNumber', "200248092374")
-              .having((l) => l.creationDate, 'creationDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.modifiedDate, 'modifiedDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.creationDate, 'creationDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.modifiedDate, 'modifiedDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
               .having((l) => l.email, 'email', "erna@bert.de"),
         );
       });
@@ -285,7 +283,7 @@ void main() {
           '''
 {
     "data": [{
-        "_id": "62e393a5fb12b967fea3d9d0",
+        "id": "62e393a5fb12b967fea3d9d0",
         "userId": "62e393a5fb12b967fea3d9d0",
         "name": "abcefghijklmnopqrstuvwxyztest",
         "city": "hamburg",
@@ -317,8 +315,10 @@ void main() {
               .having((l) => l.streetName, 'streetName', "washingtonallee")
               .having((l) => l.streetNumber, 'streetNumber', "13a")
               .having((l) => l.phoneNumber, 'phoneNumber', "200248092374")
-              .having((l) => l.creationDate, 'creationDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.modifiedDate, 'modifiedDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.creationDate, 'creationDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
+              .having((l) => l.modifiedDate, 'modifiedDate',
+                  DateTime.parse("2022-08-11T09:12:11.524Z"))
               .having((l) => l.email, 'email', "erna@bert.de"),
         );
       });

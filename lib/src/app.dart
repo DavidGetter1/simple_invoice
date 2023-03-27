@@ -1,10 +1,10 @@
 import 'package:authentication/authentication.dart';
 import 'package:bl_objects_repository/client/index.dart';
 import 'package:bl_objects_repository/invoice/repository.dart';
+import 'package:bl_objects_repository/item/models/item.dart';
 import 'package:bl_objects_repository/item/repository.dart';
 import 'package:bl_objects_repository/user/repository.dart';
 import 'package:easyinvoice/settings/customize_invoice/view/customize_invoice_screen.dart';
-import 'package:easyinvoice/settings/region/view/region.dart';
 import 'package:easyinvoice/src/start.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,12 +17,14 @@ import '../authentication/authentication_bloc.dart';
 import '../bl_objects/client/client_cubit.dart';
 import '../bl_objects/invoice/view/screens/create_invoice_screen.dart';
 import '../bl_objects/invoice/view/screens/invoice_detail_screen.dart';
-import '../bl_objects/item/create/item_create_cubit.dart';
-import '../bl_objects/item/create/view/item_create_screen/item_create_screen.dart';
 import '../bl_objects/item/crud/item_cubit.dart';
 import '../bl_objects/invoice/invoice_cubit.dart';
+import '../bl_objects/item/modify/item_modify_cubit.dart';
+import '../bl_objects/item/modify/view/item_modify_screen/item_modify_screen.dart';
+import '../bl_objects/item/view/detailed_view/screens/item_screen.dart';
 import '../bl_objects/user/user_cubit.dart';
-import '../settings/login_tiles/view/login_tiles_screen.dart';
+import '../settings/account/login_tiles/view/login_tiles_screen.dart';
+import '../settings/account/region/view/region.dart';
 import '../settings/main/language/language_cubit.dart';
 import '../settings/main/language/language_states.dart';
 
@@ -60,7 +62,8 @@ class MyApp extends StatelessWidget {
       ),
       GoRoute(
         path: '/create-item',
-        builder: (context, state) => I18n(child: const CreateItemScreen()),
+        builder: (context, state) =>
+            I18n(child: CreateItemScreen(item: state.extra as Item?)),
       ),
       GoRoute(
         path: '/login',
@@ -83,10 +86,14 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
         providers: [
           RepositoryProvider.value(value: authenticationRepository),
-          RepositoryProvider.value(value: itemRepository),
+          RepositoryProvider.value(
+              value: itemRepository
+                ..setAuthenticationRepository(authenticationRepository)),
           RepositoryProvider.value(value: clientRepository),
           RepositoryProvider.value(value: invoiceRepository),
-          RepositoryProvider.value(value: userRepository)
+          RepositoryProvider.value(
+              value: userRepository
+                ..setAuthenticationRepository(authenticationRepository))
         ],
         child: MultiBlocProvider(
             providers: [
@@ -97,12 +104,11 @@ class MyApp extends StatelessWidget {
                     userRepository: context.read<UserRepository>()),
               ),
               BlocProvider<ItemCubit>(
+                  create: (BuildContext context) =>
+                      ItemCubit(context.read<ItemRepository>())),
+              BlocProvider<ItemModifyCubit>(
                 create: (BuildContext context) =>
-                    ItemCubit(context.read<ItemRepository>()),
-              ),
-              BlocProvider<ItemCreateCubit>(
-                create: (BuildContext context) =>
-                    ItemCreateCubit(context.read<ItemRepository>()),
+                    ItemModifyCubit(context.read<ItemRepository>()),
               ),
               BlocProvider<ClientCubit>(
                 create: (BuildContext context) =>
@@ -113,6 +119,7 @@ class MyApp extends StatelessWidget {
                     InvoiceCubit(context.read<InvoiceRepository>()),
               ),
               BlocProvider<UserCubit>(
+                lazy: false,
                 create: (BuildContext context) =>
                     UserCubit(context.read<UserRepository>()),
               ),

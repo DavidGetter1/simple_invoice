@@ -10,9 +10,9 @@ abstract class I18nState extends Equatable {
 }
 
 class EnglishUSState extends I18nState {
-  EnglishUSState() : super(const Locale("en", "US"));
+  const EnglishUSState() : super(const Locale("en", "US"));
 }
 
 class GermanGermanyState extends I18nState {
-  GermanGermanyState() : super(const Locale("de", "DE"));
+  const GermanGermanyState() : super(const Locale("de", "DE"));
 }

@@ -1,4 +1,7 @@
+import 'package:authentication/authentication.dart';
+import 'package:bl_objects_repository/item/models/item.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:invoice_api_client/invoice_api_client.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -8,24 +11,25 @@ part 'item_cubit.g.dart';
 part 'item_state.dart';
 
 class ItemCubit extends HydratedCubit<ItemState> {
-  ItemCubit(this._itemRepository): super(InitialState());
+  ItemCubit(this._itemRepository) : super(InitialState()) {}
 
-
-  //was machen mit itemList so wie beim client_cubit und test schreiben
   final ItemRepository _itemRepository;
-  List<ItemDTOReceive> _itemList = [];
   int _skip = 0;
 
-  Future<void> updateItem(ItemDTOReceive item) async {
+  @visibleForTesting
+  int get skip => _skip;
 
+  @visibleForTesting
+  List<Item> get itemList => _itemList;
+
+  List<Item> get _itemList => _itemRepository.getItemList();
+
+  Future<void> refreshItemList() async {
     emit(LoadingState());
-
     try {
-      await _itemRepository.updateItem(item);
-
-      emit(ItemUpdatedState());
-    } on Exception {
-      emit(const FailureState(errorMessage: 'errorMessage'));
+      emit(OperationCompletedState(itemList: _itemList));
+    } on Exception catch (e) {
+      emit(FailureState(errorMessage: e.toString()));
     }
   }
 
@@ -43,71 +47,63 @@ class ItemCubit extends HydratedCubit<ItemState> {
     }
   }
 
-  Future<void> deleteItem(String? id) async {
-    if (id == null || id.isEmpty) return;
-
-    emit(LoadingState());
-
-    try {
-      await _itemRepository.deleteItem(id);
-      emit(ItemDeletedState());
-    } on Exception {
-      emit(const FailureState(errorMessage: 'errorMessage'));
-    }
-  }
-
-  Future<void> fetchItems({Map<String, String>? query = const {}, bool pagination = false}) async {
-    if (query == null) return;
+  Future<void> fetchItems(
+      {Map<String, String>? query, bool pagination = false}) async {
+    if (query == null) query = {};
     query['skip'] = '$_skip';
     emit(LoadingState());
-    if(!pagination){
+    if (!pagination) {
       _skip = 0;
-      _itemList = [];
     }
     try {
-      ItemResponse response = await _itemRepository.getItems(query);
-      if(pagination){
-        _skip = response.lastN;
-      }
-      if(response.itemList.isEmpty){
+      final int oldLengthItemList = _itemList.length;
+      _skip = await _itemRepository.getItems(query, pagination);
+      if (_itemList.length == oldLengthItemList) {
         emit(NoMoreResultsState());
         return;
       }
-      _itemList += response.itemList;
-      emit(ItemListFetchedState(itemList: _itemList, lastN: response.lastN));
+      emit(OperationCompletedState(itemList: _itemList));
     } on Exception {
       emit(const FailureState(errorMessage: 'errorMessage'));
     }
   }
 
+  //TODO where is OperationComplete state?
+
   @override
   ItemState? fromJson(Map<String, dynamic> json) {
-    switch (json["state"]){
-      case "InitialState": return InitialState();
-      case "LoadingState": return LoadingState();
-      case "ItemDeletedState": return ItemDeletedState();
-      case "ItemUpdatedState": return ItemUpdatedState();
-      case "ItemFetchedState": return ItemFetchedState.fromJson(json["class"]);
-      case "ItemCreatedState": return ItemCreatedState.fromJson(json["class"]);
-      case "ItemListFetchedState": return ItemListFetchedState.fromJson(json["class"]);
-      case "FailureState": return FailureState.fromJson(json["class"]);
+    switch (json["state"]) {
+      case "InitialState":
+        return InitialState();
+      case "LoadingState":
+        return LoadingState();
+      case "ItemFetchedState":
+        return ItemFetchedState.fromJson(json["class"]);
+      case "FailureState":
+        return FailureState.fromJson(json["class"]);
     }
     throw UnimplementedError();
   }
 
   @override
   Map<String, dynamic>? toJson(ItemState state) {
-    switch (state.runtimeType){
-      case ItemCreatedState : return {"state": "ItemCreatedState", "class": (state as ItemCreatedState).toJson()};
-      case ItemFetchedState : return {"state": "ItemFetchedState", "class": (state as ItemFetchedState).toJson()};
-      case ItemListFetchedState : return {"state": "ItemListFetchedState", "class":(state as ItemListFetchedState).toJson()};
-      case InitialState : return {"state": "InitialState"};
-      case LoadingState : return {"state": "LoadingState"};
-      case ItemDeletedState : return {"state": "ItemDeletedState"};
-      case ItemUpdatedState : return {"state": "ItemUpdatedState"};
-      case FailureState : return {"state": "FailureState", "class":(state as FailureState).toJson()};
-
-      default : return {};
+    switch (state.runtimeType) {
+      case ItemFetchedState:
+        return {
+          "state": "ItemFetchedState",
+          "class": (state as ItemFetchedState).toJson()
+        };
+      case InitialState:
+        return {"state": "InitialState"};
+      case LoadingState:
+        return {"state": "LoadingState"};
+      case FailureState:
+        return {
+          "state": "FailureState",
+          "class": (state as FailureState).toJson()
+        };
+      default:
+        return {};
     }
   }
 }

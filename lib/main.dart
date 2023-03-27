@@ -9,24 +9,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
-void main() async{
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HydratedBloc.storage = await HydratedStorage.build(
-      storageDirectory: kIsWeb
-          ? HydratedStorage.webStorageDirectory
-          : await getTemporaryDirectory(),
+    storageDirectory: kIsWeb
+        ? HydratedStorage.webStorageDirectory
+        : await getTemporaryDirectory(),
   );
   await Firebase.initializeApp();
-  runApp(
-      MyApp(
-        authenticationRepository: AuthenticationRepository(),
-        itemRepository: ItemRepository(),
-        clientRepository: ClientRepository(),
-        invoiceRepository: InvoiceRepository(),
-        userRepository: UserRepository()
-      )
-  );
-
-
+  runApp(MyApp(
+      authenticationRepository: AuthenticationRepository(),
+      itemRepository: ItemRepository(),
+      clientRepository: ClientRepository(),
+      invoiceRepository: InvoiceRepository(),
+      userRepository: UserRepository()));
 }
-

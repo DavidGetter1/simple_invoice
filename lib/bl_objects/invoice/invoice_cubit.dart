@@ -8,14 +8,15 @@ part 'invoice_cubit.g.dart';
 part 'invoice_state.dart';
 
 class InvoiceCubit extends HydratedCubit<InvoiceState> {
-  InvoiceCubit(this._invoiceRepository): super(InitialState());
+  InvoiceCubit(this._invoiceRepository) : super(InitialState()) {
+    print("InvoiceCubit constructor");
+  }
 
   final InvoiceRepository _invoiceRepository;
-  List<Invoice> _invoiceList = [];
+  List<InvoiceDTO> _invoiceList = [];
   int _skip = 0;
 
-  Future<void> updateInvoice(Invoice invoice) async {
-
+  Future<void> updateInvoice(InvoiceDTO invoice) async {
     emit(LoadingState());
 
     try {
@@ -54,33 +55,34 @@ class InvoiceCubit extends HydratedCubit<InvoiceState> {
     }
   }
 
-  Future<void> fetchInvoices({Map<String, String>? query = const {}, bool pagination = false}) async {
+  Future<void> fetchInvoices(
+      {Map<String, String>? query = const {}, bool pagination = false}) async {
     if (query == null) return;
     query['skip'] = '$_skip';
     emit(LoadingState());
-    if(!pagination){
+    if (!pagination) {
       _skip = 0;
       _invoiceList = [];
     }
 
     try {
       InvoiceResponse response = await _invoiceRepository.getInvoices(query);
-      if(pagination){
+      if (pagination) {
         _skip = response.lastN;
       }
-      if(response.invoiceList.isEmpty){
+      if (response.invoiceList.isEmpty) {
         emit(NoMoreResultsState());
         return;
       }
       _invoiceList += response.invoiceList;
-      emit(InvoiceListFetchedState(invoiceList: _invoiceList, lastN: response.lastN));
+      emit(InvoiceListFetchedState(
+          invoiceList: _invoiceList, lastN: response.lastN));
     } on Exception {
       emit(const FailureState(errorMessage: 'errorMessage'));
     }
   }
 
-  Future<void> insertInvoice(Invoice invoice) async {
-
+  Future<void> insertInvoice(InvoiceDTO invoice) async {
     emit(LoadingState());
 
     try {
@@ -95,32 +97,61 @@ class InvoiceCubit extends HydratedCubit<InvoiceState> {
   //better ideas are appreciated
   @override
   InvoiceState? fromJson(Map<String, dynamic> json) {
-    switch (json["state"]){
-      case "InitialState": return InitialState();
-      case "LoadingState": return LoadingState();
-      case "InvoiceDeletedState": return InvoiceDeletedState();
-      case "InvoiceUpdatedState": return InvoiceUpdatedState();
-      case "InvoiceFetchedState": return InvoiceFetchedState.fromJson(json["class"]);
-      case "InvoiceCreatedState": return InvoiceCreatedState.fromJson(json["class"]);
-      case "InvoiceListFetchedState": return InvoiceListFetchedState.fromJson(json["class"]);
-      case "FailureState": return FailureState.fromJson(json["class"]);
+    switch (json["state"]) {
+      case "InitialState":
+        return InitialState();
+      case "LoadingState":
+        return LoadingState();
+      case "InvoiceDeletedState":
+        return InvoiceDeletedState();
+      case "InvoiceUpdatedState":
+        return InvoiceUpdatedState();
+      case "InvoiceFetchedState":
+        return InvoiceFetchedState.fromJson(json["class"]);
+      case "InvoiceCreatedState":
+        return InvoiceCreatedState.fromJson(json["class"]);
+      case "InvoiceListFetchedState":
+        return InvoiceListFetchedState.fromJson(json["class"]);
+      case "FailureState":
+        return FailureState.fromJson(json["class"]);
     }
     throw UnimplementedError();
   }
 
   @override
   Map<String, dynamic>? toJson(InvoiceState state) {
-    switch (state.runtimeType){
-      case InvoiceCreatedState : return {"state": "InvoiceCreatedState", "class": (state as InvoiceCreatedState).toJson()};
-      case InvoiceFetchedState : return {"state": "InvoiceFetchedState", "class": (state as InvoiceFetchedState).toJson()};
-      case InvoiceListFetchedState : return {"state": "InvoiceListFetchedState", "class":(state as InvoiceListFetchedState).toJson()};
-      case InitialState : return {"state": "InitialState"};
-      case LoadingState : return {"state": "LoadingState"};
-      case InvoiceDeletedState : return {"state": "InvoiceDeletedState"};
-      case InvoiceUpdatedState : return {"state": "InvoiceUpdatedState"};
-      case FailureState : return {"state": "FailureState", "class":(state as FailureState).toJson()};
+    switch (state.runtimeType) {
+      case InvoiceCreatedState:
+        return {
+          "state": "InvoiceCreatedState",
+          "class": (state as InvoiceCreatedState).toJson()
+        };
+      case InvoiceFetchedState:
+        return {
+          "state": "InvoiceFetchedState",
+          "class": (state as InvoiceFetchedState).toJson()
+        };
+      case InvoiceListFetchedState:
+        return {
+          "state": "InvoiceListFetchedState",
+          "class": (state as InvoiceListFetchedState).toJson()
+        };
+      case InitialState:
+        return {"state": "InitialState"};
+      case LoadingState:
+        return {"state": "LoadingState"};
+      case InvoiceDeletedState:
+        return {"state": "InvoiceDeletedState"};
+      case InvoiceUpdatedState:
+        return {"state": "InvoiceUpdatedState"};
+      case FailureState:
+        return {
+          "state": "FailureState",
+          "class": (state as FailureState).toJson()
+        };
 
-      default : return {};
+      default:
+        return {};
     }
   }
 }

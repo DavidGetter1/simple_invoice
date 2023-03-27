@@ -1,14 +1,14 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:invoice_api_client/invoice_api_client.dart' as invoice_api;
 import 'package:bl_objects_repository/item/index.dart';
-import 'package:invoice_api_client/items/models/itemDTOReceive.dart';
+import 'package:invoice_api_client/items/models/itemDTO.dart';
 import 'package:invoice_api_client/items/models/itemDTOSend.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 class MockItemApiClient extends Mock implements invoice_api.ItemApiClient {}
 
-class MockItem extends Mock implements invoice_api.ItemDTOReceive {}
+class MockItem extends Mock implements invoice_api.ItemDTO {}
 
 void main() {
   group('ItemRepository', () {
@@ -48,7 +48,7 @@ void main() {
       });
 
       test('returns correct Item on success', () async {
-        final item = ItemDTOReceive(
+        final item = ItemDTO(
             userId: '62e393a5fb12b967fea3d9d0',
             id: '62e393a5fb12b967fea3d9d0',
             title: 'abcefghijklmnopqrstuvwxyztest',
@@ -66,7 +66,7 @@ void main() {
         final actual = await itemRepository.getItem(id);
         expect(
           actual,
-          ItemDTOReceive(
+          ItemDTO(
               userId: '62e393a5fb12b967fea3d9d0',
               id: '62e393a5fb12b967fea3d9d0',
               title: 'abcefghijklmnopqrstuvwxyztest',
@@ -91,7 +91,7 @@ void main() {
       });
 
       test('returns correct Object on success', () async {
-        final item = ItemDTOReceive(
+        final item = ItemDTO(
             userId: '62e393a5fb12b967fea3d9d0',
             id: '62e393a5fb12b967fea3d9d0',
             title: 'abcefghijklmnopqrstuvwxyztest',
@@ -113,7 +113,7 @@ void main() {
         expect(
             actual,
             ItemResponse(itemList: [
-              ItemDTOReceive(
+              ItemDTO(
                   userId: '62e393a5fb12b967fea3d9d0',
                   id: '62e393a5fb12b967fea3d9d0',
                   title: 'abcefghijklmnopqrstuvwxyztest',
@@ -129,7 +129,7 @@ void main() {
       });
     });
     group('updateItem', () {
-      final item = ItemDTOReceive(
+      final item = ItemDTO(
           userId: '62e393a5fb12b967fea3d9d0',
           id: '62e393a5fb12b967fea3d9d0',
           title: 'abcefghijklmnopqrstuvwxyztest',
@@ -149,7 +149,7 @@ void main() {
       });
     });
     group('insert', () {
-      final item = ItemDTOSend(
+      final item = ItemDTO(
           userId: '62e393a5fb12b967fea3d9d0',
           title: 'abcefghijklmnopqrstuvwxyztest',
           taxIncluded: true,

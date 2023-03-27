@@ -35,16 +35,14 @@ class ClientApiClient {
       '/api/v1/bl_objects/client/$id',
     );
     final clientResponse = await _httpClient.delete(clientRequest);
-  print(clientResponse.body);
+    print(clientResponse.body);
     if (clientResponse.statusCode != 200) {
       throw Exception(clientResponse.body);
     }
 
-    final clientJson = jsonDecode(
-        clientResponse.body
-    );
+    final clientJson = jsonDecode(clientResponse.body);
 
-    if(clientJson["deletedCount"] != 1){
+    if (clientJson["deletedCount"] != 1) {
       throw new Exception('No clients deleted');
     }
   }
@@ -55,56 +53,51 @@ class ClientApiClient {
   dynamic getClientById(String id) async {
     final clientRequest = Uri.https(
       _baseUrl,
-        '/api/v1/bl_objects/client/$id',
+      '/api/v1/bl_objects/client/$id',
     );
     final clientResponse = await _httpClient.get(clientRequest);
 
     if (clientResponse.statusCode != 200) {
       throw ClientIdRequestFailure(clientResponse.body.toString());
     }
+    final clientJson = jsonDecode(clientResponse.body);
 
-    final clientJson = jsonDecode(
-      clientResponse.body
-    );
-
-    if(clientJson == {}){
+    if (clientJson == {}) {
       throw new Exception('No clients found');
     }
 
-    try{
-    Client client = Client.fromJson(clientJson as Map<String, dynamic>);
-    return client;
-  }catch(e){
-    print(e.toString());
-    }}
+    try {
+      Client client = Client.fromJson(clientJson as Map<String, dynamic>);
+      return client;
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   /**
    * Queries the DB for clients.
    */
   dynamic getClients(Map<String, String> query) async {
-    final clientRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/client',
-      query
-    );
+    final clientRequest =
+        Uri.https(_baseUrl, '/api/v1/bl_objects/client', query);
     final clientResponse = await _httpClient.get(clientRequest);
     print(clientResponse.body);
     if (clientResponse.statusCode != 200) {
       throw new Exception(clientResponse.body);
     }
 
-    final clientJson = jsonDecode(
-        clientResponse.body
-    );
-    if(clientJson["data"].isEmpty){
+    final clientJson = jsonDecode(clientResponse.body);
+    if (clientJson["data"].isEmpty) {
       throw new Exception('No clients found');
     }
-    try{
-      List<Client> clientList = List<Client>.from(clientJson["data"].map((client) => Client.fromJson(client)).toList());
+    try {
+      List<Client> clientList = List<Client>.from(
+          clientJson["data"].map((client) => Client.fromJson(client)).toList());
       return {"clientList": clientList, "lastN": clientJson["lastN"]};
-    }catch(e){
+    } catch (e) {
       print(e.toString());
-    }}
+    }
+  }
 
   /**
    * Inserts the [Client] into the DB.
@@ -115,14 +108,13 @@ class ClientApiClient {
       '/api/v1/bl_objects/client',
     );
     String clientJson = jsonEncode(client.toJson());
-    final clientResponse = await _httpClient.put(clientRequest, body: clientJson, headers: {"Content-Type":"application/json"});
+    final clientResponse = await _httpClient.put(clientRequest,
+        body: clientJson, headers: {"Content-Type": "application/json"});
     if (clientResponse.statusCode != 201) {
       throw Exception(clientResponse.body);
     }
-    final decodedResponse = jsonDecode(
-        clientResponse.body
-    );
-    return decodedResponse ["upsertedId"];
+    final decodedResponse = jsonDecode(clientResponse.body);
+    return decodedResponse["upsertedId"];
   }
 
   /**
@@ -134,17 +126,16 @@ class ClientApiClient {
       '/api/v1/bl_objects/client',
     );
     String clientJson = jsonEncode(client.toJson());
-    final clientResponse = await _httpClient.put(clientRequest, body: clientJson, headers: {"Content-Type":"application/json"});
+    final clientResponse = await _httpClient.put(clientRequest,
+        body: clientJson, headers: {"Content-Type": "application/json"});
     print(clientResponse.body);
     if (clientResponse.statusCode != 200) {
       throw Exception(clientResponse.body);
     }
 
-    final responseJson = jsonDecode(
-        clientResponse.body
-    );
+    final responseJson = jsonDecode(clientResponse.body);
     final bool updated = responseJson["modifiedCount"] == 1;
-    if(!updated){
+    if (!updated) {
       throw new Exception('No clients updated');
     }
   }

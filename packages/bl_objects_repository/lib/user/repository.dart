@@ -1,40 +1,86 @@
 import 'dart:async';
 
+import 'package:authentication/authentication.dart';
 import 'package:invoice_api_client/invoice_api_client.dart';
-import 'package:invoice_api_client/users/models/userDTOSend.dart';
 
+import 'models/user.dart';
 import 'models/userResponse.dart';
 
 class UserFailure implements Exception {}
 
 class UserRepository {
   UserRepository({UserApiClient? userApiClient})
-      : _userApiClient = userApiClient ?? UserApiClient();
+      : _userApiClient = userApiClient ?? UserApiClient() {}
+
+  late User _currentUser;
+
+  User get currentUser => _currentUser;
 
   final UserApiClient _userApiClient;
+  late AuthenticationRepository _authenticationRepository;
 
-  Future<UserDTOReceive> getUser(String id) async{
-    UserDTOReceive user = await _userApiClient.getUserById(id);
-    return user;
+  void setAuthenticationRepository(
+      AuthenticationRepository authenticationRepository) {
+    _authenticationRepository = authenticationRepository;
+    _authenticationRepository.userId.listen(_onUserIdChanged);
   }
 
-  Future<UserResponse> getUsers(Map<String, String> query) async{
+  Future<void> _onUserIdChanged(String id) async {
+    _currentUser = await getOrCreateUser(id);
+  }
+
+  Future<User> getUser(String id) async {
+    UserDTO user = await _userApiClient.getUserById(id);
+    User transformedUser = User.fromUserDTO(user);
+    return transformedUser;
+  }
+
+  Future<User> getOrCreateUser(String id) async {
+    UserDTO user = await _userApiClient.getOrCreateUser(id);
+    User transformedUser = User.fromUserDTO(user);
+    return transformedUser;
+  }
+
+  Future<UserResponse> getUsers(Map<String, String> query) async {
     Map<String, dynamic> responseMap = await _userApiClient.getUsers(query);
-    UserResponse userResponse = UserResponse(userList: responseMap["userList"], lastN: responseMap["lastN"]);
+    UserResponse userResponse = UserResponse(
+        userList:
+            responseMap["userList"].map((e) => User.fromUserDTO(e)).toList(),
+        lastN: responseMap["lastN"]);
     return userResponse;
   }
 
-  deleteUser(String id) async{
+  deleteUser(String id) async {
     await _userApiClient.deleteUser(id);
   }
 
-  Future<String> insertUser(UserDTOSend user) async{
-    String insertedId = await _userApiClient.insertUser(user);
+  Future<String> insertUser(
+      String id,
+      String name,
+      BillingInformation billingInformation,
+      Locale locale,
+      String email,
+      bool hasPremium) async {
+    UserDTO userDTO = UserDTO(
+        id: id,
+        name: name,
+        billingInformation: billingInformation,
+        locale: locale,
+        email: email,
+        hasPremium: hasPremium);
+    String insertedId = await _userApiClient.insertUser(userDTO);
     return insertedId;
   }
 
-
-  updateUser(UserDTOSend user) async{
-    await _userApiClient.updateUser(user);
+  updateUser(String id, String name, BillingInformation billingInformation,
+      Locale locale, String email, bool hasPremium) async {
+    UserDTO userDTO = UserDTO(
+        id: id,
+        name: name,
+        billingInformation: billingInformation,
+        locale: locale,
+        email: email,
+        hasPremium: hasPremium);
+    await _userApiClient.updateUser(userDTO);
   }
 }

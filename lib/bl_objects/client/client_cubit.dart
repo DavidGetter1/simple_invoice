@@ -8,14 +8,16 @@ part 'client_cubit.g.dart';
 part 'client_state.dart';
 
 class ClientCubit extends HydratedCubit<ClientState> {
-  ClientCubit(this._clientRepository): super(InitialState());
+  ClientCubit(this._clientRepository) : super(InitialState()) {
+    print("ClientCubit constructor");
+  }
 
   final ClientRepository _clientRepository;
   List<Client> _clientList = [];
   int _skip = 0;
 
   Future<void> updateClient(Client client) async {
-
+    print("updating client...");
     emit(LoadingState());
 
     try {
@@ -27,6 +29,7 @@ class ClientCubit extends HydratedCubit<ClientState> {
   }
 
   Future<void> fetchClient(String? id) async {
+    print("fetching client...");
     if (id == null || id.isEmpty) return;
 
     emit(LoadingState());
@@ -41,6 +44,7 @@ class ClientCubit extends HydratedCubit<ClientState> {
   }
 
   Future<void> deleteClient(String? id) async {
+    print("deleting client...");
     if (id == null || id.isEmpty) return;
 
     emit(LoadingState());
@@ -53,32 +57,37 @@ class ClientCubit extends HydratedCubit<ClientState> {
     }
   }
 
-  Future<void> fetchClients({Map<String, String>? query = const {}, bool pagination = false}) async {
-    if (query == null) return;
+  Future<void> fetchClients(
+      {Map<String, String>? query, bool pagination = false}) async {
+    print("fetching clients...");
+    query ??= {};
     query['skip'] = '$_skip';
     emit(LoadingState());
-    if(!pagination){
+    if (!pagination) {
       _skip = 0;
       _clientList = [];
     }
     try {
       ClientResponse response = await _clientRepository.getClients(query);
-      if(pagination){
+      if (pagination) {
         _skip = response.lastN;
       }
-      if(response.clientList.isEmpty){
+      if (response.clientList.isEmpty) {
         emit(NoMoreResultsState());
         return;
       }
       _clientList += response.clientList;
-      emit(ClientListFetchedState(clientList: _clientList, lastN: response.lastN));
-    } on Exception {
-      emit(const FailureState(errorMessage: 'errorMessage'));
+      emit(ClientListFetchedState(
+          clientList: _clientList, lastN: response.lastN));
+    } on Exception catch (e) {
+      print("Error in fetchClients");
+      print(e.toString());
+      emit(FailureState(errorMessage: "e.toString()"));
     }
   }
 
   Future<void> insertClient(Client client) async {
-
+    print("inserting client...");
     emit(LoadingState());
 
     try {
@@ -92,32 +101,61 @@ class ClientCubit extends HydratedCubit<ClientState> {
 
   @override
   ClientState? fromJson(Map<String, dynamic> json) {
-    switch (json["state"]){
-      case "InitialState": return InitialState();
-      case "LoadingState": return LoadingState();
-      case "ClientDeletedState": return ClientDeletedState();
-      case "ClientUpdatedState": return ClientUpdatedState();
-      case "ClientFetchedState": return ClientFetchedState.fromJson(json["class"]);
-      case "ClientCreatedState": return ClientCreatedState.fromJson(json["class"]);
-      case "ClientListFetchedState": return ClientListFetchedState.fromJson(json["class"]);
-      case "FailureState": return FailureState.fromJson(json["class"]);
+    switch (json["state"]) {
+      case "InitialState":
+        return InitialState();
+      case "LoadingState":
+        return LoadingState();
+      case "ClientDeletedState":
+        return ClientDeletedState();
+      case "ClientUpdatedState":
+        return ClientUpdatedState();
+      case "ClientFetchedState":
+        return ClientFetchedState.fromJson(json["class"]);
+      case "ClientCreatedState":
+        return ClientCreatedState.fromJson(json["class"]);
+      case "ClientListFetchedState":
+        return ClientListFetchedState.fromJson(json["class"]);
+      case "FailureState":
+        return FailureState.fromJson(json["class"]);
     }
     throw UnimplementedError();
   }
 
   @override
   Map<String, dynamic>? toJson(ClientState state) {
-    switch (state.runtimeType){
-      case ClientCreatedState : return {"state": "ClientCreatedState", "class": (state as ClientCreatedState).toJson()};
-      case ClientFetchedState : return {"state": "ClientFetchedState", "class": (state as ClientFetchedState).toJson()};
-      case ClientListFetchedState : return {"state": "ClientListFetchedState", "class":(state as ClientListFetchedState).toJson()};
-      case InitialState : return {"state": "InitialState"};
-      case LoadingState : return {"state": "LoadingState"};
-      case ClientDeletedState : return {"state": "ClientDeletedState"};
-      case ClientUpdatedState : return {"state": "ClientUpdatedState"};
-      case FailureState : return {"state": "FailureState", "class":(state as FailureState).toJson()};
+    switch (state.runtimeType) {
+      case ClientCreatedState:
+        return {
+          "state": "ClientCreatedState",
+          "class": (state as ClientCreatedState).toJson()
+        };
+      case ClientFetchedState:
+        return {
+          "state": "ClientFetchedState",
+          "class": (state as ClientFetchedState).toJson()
+        };
+      case ClientListFetchedState:
+        return {
+          "state": "ClientListFetchedState",
+          "class": (state as ClientListFetchedState).toJson()
+        };
+      case InitialState:
+        return {"state": "InitialState"};
+      case LoadingState:
+        return {"state": "LoadingState"};
+      case ClientDeletedState:
+        return {"state": "ClientDeletedState"};
+      case ClientUpdatedState:
+        return {"state": "ClientUpdatedState"};
+      case FailureState:
+        return {
+          "state": "FailureState",
+          "class": (state as FailureState).toJson()
+        };
 
-      default : return {};
+      default:
+        return {};
     }
   }
 }

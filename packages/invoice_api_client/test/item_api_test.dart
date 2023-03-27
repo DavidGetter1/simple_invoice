@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:invoice_api_client/invoice_api_client.dart';
-import 'package:invoice_api_client/items/models/itemDTOSend.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -11,9 +10,7 @@ class MockHttpClient extends Mock implements http.Client {}
 
 class MockResponse extends Mock implements http.Response {}
 
-class MockItemDTOReceive extends Mock implements ItemDTOReceive {}
-
-class MockItemDTOSend extends Mock implements ItemDTOSend {}
+class MockItemDTO extends Mock implements ItemDTO {}
 
 class FakeUri extends Fake implements Uri {}
 
@@ -43,28 +40,22 @@ void main() {
         when(() => response.statusCode).thenReturn(200);
         when(() => response.body).thenReturn('''{
     "acknowledged": true,
-    "modifiedCount": 1,
-    "upsertedId": null,
-    "upsertedCount": 0,
-    "matchedCount": 1
+    "insertedId": "62e393a5fb12b967fea3d9d0"
 }''');
-        when(() => httpClient.put(any(), body: {}))
+        when(() => httpClient.post(any(), body: {}))
             .thenAnswer((_) async => response);
-        ItemDTOSend fakeItem = MockItemDTOSend();
+        ItemDTO fakeItem = MockItemDTO();
         when(fakeItem.toJson).thenReturn({});
         final body = jsonEncode(fakeItem.toJson());
         try {
           await itemApiClient.insertItem(fakeItem);
         } catch (_) {}
         verify(
-          () => httpClient.put(
-              Uri.https(
-                'us-central1-invoice-c63dc.cloudfunctions.net',
-                '/api/v1/bl_objects/item',
-              ),
-              headers: {"Content-Type": "application/json"},
-              body: body,
-              encoding: null),
+          () => httpClient.post(
+            any(),
+            headers: {"Content-Type": "application/json"},
+            body: body,
+          ),
         ).called(1);
       });
 
@@ -78,7 +69,7 @@ void main() {
     "upsertedCount": 0,
     "matchedCount": 1
 }''');
-        ItemDTOReceive fakeItem = MockItemDTOReceive();
+        ItemDTO fakeItem = MockItemDTO();
         when(fakeItem.toJson).thenReturn({});
         final body = jsonEncode(fakeItem.toJson());
 
@@ -97,7 +88,7 @@ void main() {
         when(() => response.body).thenReturn('''{
     "error on updating item"
 }''');
-        ItemDTOReceive fakeItem = MockItemDTOReceive();
+        ItemDTO fakeItem = MockItemDTO();
         when(fakeItem.toJson).thenReturn({});
         final body = jsonEncode(fakeItem.toJson());
 
@@ -120,20 +111,15 @@ void main() {
         "insertedId": "62e393a5fb12b967fea3d9d0"
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-        ItemDTOSend fakeItem = MockItemDTOSend();
+        ItemDTO fakeItem = MockItemDTO();
         when(fakeItem.toJson).thenReturn({});
         final body = jsonEncode(fakeItem.toJson());
         try {
           await itemApiClient.insertItem(fakeItem);
         } catch (_) {}
         verify(
-          () => httpClient.put(
-              Uri.https(
-                'us-central1-invoice-c63dc.cloudfunctions.net',
-                '/api/v1/bl_objects/item',
-              ),
-              body: body,
-              headers: {"Content-Type": "application/json"}),
+          () => httpClient.post(any(),
+              body: body, headers: {"Content-Type": "application/json"}),
         ).called(1);
       });
       test('inserts item, id gets extracted correctly', () async {
@@ -143,7 +129,7 @@ void main() {
         "acknowledged": true,
         "insertedId": "62e393a5fb12b967fea3d9d0"
 }''');
-        ItemDTOSend fakeItem = MockItemDTOSend();
+        ItemDTO fakeItem = MockItemDTO();
         when(fakeItem.toJson).thenReturn({});
         final body = jsonEncode(fakeItem.toJson());
         when(() => httpClient.post(any(),
@@ -163,10 +149,10 @@ void main() {
         when(() => response.body).thenReturn('''{
     "error on inserting item"
 }''');
-        ItemDTOSend fakeItem = MockItemDTOSend();
+        ItemDTO fakeItem = MockItemDTO();
         when(fakeItem.toJson).thenReturn({});
         final body = jsonEncode(fakeItem.toJson());
-        when(() => httpClient.put(any(),
+        when(() => httpClient.post(any(),
                 body: body, headers: {"Content-Type": "application/json"}))
             .thenAnswer((_) async => response);
         expect(
@@ -181,16 +167,15 @@ void main() {
       test('getItemById makes correct http request', () async {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(200);
-        when(() => response.body).thenReturn('{}');
-        when(() => httpClient.get(any())).thenAnswer((_) async => response);
+        when(() => response.body).thenReturn(
+            '{"id":"641ec65b3323dcbf06b7f45a","userId":"lXxeavIFaNfxE8pbKZpcchU7kyl1","title":"Schraube","description":"Eine Schraube","pricePerUnit":3,"tax":0,"discount":0,"creationDate":"2023-03-25T09:31:04.548Z","modifiedDates":["2023-03-25T09:31:04.548Z"]}');
+        when(() => httpClient.get(any(), headers: any(named: "headers")))
+            .thenAnswer((_) async => response);
         try {
           await itemApiClient.getItemById(id);
         } catch (_) {}
         verify(
-          () => httpClient.get(
-            Uri.https('us-central1-invoice-c63dc.cloudfunctions.net',
-                '/api/v1/bl_objects/item/$id'),
-          ),
+          () => httpClient.get(any(), headers: any(named: "headers")),
         ).called(1);
       });
 
@@ -198,15 +183,13 @@ void main() {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(200);
         when(() => response.body).thenReturn('{}');
-        when(() => httpClient.get(any())).thenAnswer((_) async => response);
+        when(() => httpClient.get(any(), headers: any(named: "headers")))
+            .thenAnswer((_) async => response);
         try {
           await itemApiClient.getItems({});
         } catch (_) {}
         verify(
-          () => httpClient.get(
-            Uri.https('us-central1-invoice-c63dc.cloudfunctions.net',
-                '/api/v1/bl_objects/item', {}),
-          ),
+          () => httpClient.get(any()),
         ).called(1);
       });
 
@@ -241,42 +224,23 @@ void main() {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(200);
         when(() => response.body).thenReturn(
-          '''
-{
-    
-        "_id": "62e393a5fb12b967fea3d9d0",
-        "userId": "62e393a5fb12b967fea3d9d0",
-        "title": "abcefghijklmnopqrstuvwxyztest",
-        "description": "Bricks for construction",
-        "pricePerUnit": 17.625,
-        "tax": 0.19,
-        "discount": 0.02,
-        "taxedAmount": 15,
-        "taxIncluded": true,
-        "creationDate": "2022-08-11T09:12:11.524Z",
-        "modifiedDate": "2022-08-11T09:12:11.524Z"
-    
-}''',
-        );
+            '{"id":"641ec65b3323dcbf06b7f45a","userId":"lXxeavIFaNfxE8pbKZpcchU7kyl1","title":"Schraube","description":"Eine Schraube","pricePerUnit":3,"tax":0,"discount":0,"creationDate":"2023-03-25T09:31:04.548Z","modifiedDates":["2023-03-25T09:31:04.548Z"]}');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         final actual = await itemApiClient.getItemById(id);
         expect(
           actual,
-          isA<ItemDTOReceive>()
-              .having((l) => l.title, 'title', 'abcefghijklmnopqrstuvwxyztest')
-              .having((l) => l.id, 'id', '62e393a5fb12b967fea3d9d0')
-              .having((l) => l.userId, 'userId', '62e393a5fb12b967fea3d9d0')
-              .having((l) => l.description, 'description',
-                  'Bricks for construction')
-              .having((l) => l.pricePerUnit, 'pricePerUnit', 17.625)
-              .having((l) => l.tax, 'tax', 0.19)
-              .having((l) => l.discount, 'discount', 0.02)
-              .having((l) => l.taxIncluded, 'taxIncluded', true)
+          isA<ItemDTO>()
+              .having((l) => l.title, 'title', 'Schraube')
+              .having((l) => l.id, 'id', '641ec65b3323dcbf06b7f45a')
+              .having((l) => l.userId, 'userId', 'lXxeavIFaNfxE8pbKZpcchU7kyl1')
+              .having((l) => l.description, 'description', 'Eine Schraube')
+              .having((l) => l.pricePerUnit, 'pricePerUnit', 3)
+              .having((l) => l.tax, 'tax', 0)
+              .having((l) => l.discount, 'discount', 0)
               .having((l) => l.creationDate, 'creationDate',
-                  DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.modifiedDate, 'modifiedDate',
-                  DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.taxedAmount, 'taxedAmount', 15),
+                  DateTime.parse("2023-03-25T09:31:04.548Z"))
+              .having((l) => l.modifiedDates, 'modifiedDates',
+                  [DateTime.parse("2023-03-25T09:31:04.548Z")]),
         );
       });
 
@@ -286,43 +250,28 @@ void main() {
         when(() => response.body).thenReturn(
           '''
 {
-    "data": [{
-        "_id": "62e393a5fb12b967fea3d9d0",
-        "userId": "62e393a5fb12b967fea3d9d0",
-        "title": "abcefghijklmnopqrstuvwxyztest",
-        "description": "Bricks for construction",
-        "pricePerUnit": 17.625,
-        "tax": 0.19,
-        "discount": 0.02,
-        "taxedAmount": 15,
-        "taxIncluded": true,
-        "creationDate": "2022-08-11T09:12:11.524Z",
-        "modifiedDate": "2022-08-11T09:12:11.524Z"
-    }],
+    "data": [{"id":"641ec65b3323dcbf06b7f45a","userId":"lXxeavIFaNfxE8pbKZpcchU7kyl1","title":"Schraube","description":"Eine Schraube","pricePerUnit":3,"tax":0,"discount":0,"creationDate":"2023-03-25T09:31:04.548Z","modifiedDates":["2023-03-25T09:31:04.548Z"]}],
     "lastN": 1
     
 }''',
         );
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-        final actual = await itemApiClient.getItems({});
+        final ItemResponse actual = await itemApiClient.getItems({});
         print(actual);
         expect(
-          actual["itemList"][0],
-          isA<ItemDTOReceive>()
-              .having((l) => l.title, 'title', 'abcefghijklmnopqrstuvwxyztest')
-              .having((l) => l.id, 'id', '62e393a5fb12b967fea3d9d0')
-              .having((l) => l.userId, 'userId', '62e393a5fb12b967fea3d9d0')
-              .having((l) => l.description, 'description',
-                  'Bricks for construction')
-              .having((l) => l.pricePerUnit, 'pricePerUnit', 17.625)
-              .having((l) => l.tax, 'tax', 0.19)
-              .having((l) => l.discount, 'discount', 0.02)
-              .having((l) => l.taxIncluded, 'taxIncluded', true)
+          actual.itemList[0],
+          isA<ItemDTO>()
+              .having((l) => l.title, 'title', 'Schraube')
+              .having((l) => l.id, 'id', '641ec65b3323dcbf06b7f45a')
+              .having((l) => l.userId, 'userId', 'lXxeavIFaNfxE8pbKZpcchU7kyl1')
+              .having((l) => l.description, 'description', 'Eine Schraube')
+              .having((l) => l.pricePerUnit, 'pricePerUnit', 3)
+              .having((l) => l.tax, 'tax', 0)
+              .having((l) => l.discount, 'discount', 0)
               .having((l) => l.creationDate, 'creationDate',
-                  DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.modifiedDate, 'modifiedDate',
-                  DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.taxedAmount, 'taxedAmount', 15),
+                  DateTime.parse("2023-03-25T09:31:04.548Z"))
+              .having((l) => l.modifiedDates, 'modifiedDates',
+                  [DateTime.parse("2023-03-25T09:31:04.548Z")]),
         );
       });
     });

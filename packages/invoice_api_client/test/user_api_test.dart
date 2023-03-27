@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:invoice_api_client/invoice_api_client.dart';
-import 'package:invoice_api_client/users/models/userDTOSend.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -12,9 +11,7 @@ class MockHttpClient extends Mock implements http.Client {}
 
 class MockResponse extends Mock implements http.Response {}
 
-class MockUserDTOSend extends Mock implements UserDTOSend {}
-
-class MockUserDTOReceive extends Mock implements UserDTOReceive {}
+class MockUserDTO extends Mock implements UserDTO {}
 
 class FakeUri extends Fake implements Uri {}
 
@@ -38,8 +35,6 @@ void main() {
       });
     });
 
-
-
     group('user update', () {
       test('makes correct http request', () async {
         final response = MockResponse();
@@ -51,23 +46,23 @@ void main() {
     "upsertedCount": 0,
     "matchedCount": 1
 }''');
-        when(() => httpClient.put(any(), body: {})).thenAnswer((_) async => response);
-        UserDTOSend fakeUser = MockUserDTOSend();
+        when(() => httpClient.put(any(), body: {}))
+            .thenAnswer((_) async => response);
+        UserDTO fakeUser = MockUserDTO();
         when(fakeUser.toJson).thenReturn({});
         final body = jsonEncode(fakeUser.toJson());
         try {
           await userApiClient.insertUser(fakeUser);
         } catch (_) {}
         verify(
-              () => httpClient.put(
+          () => httpClient.put(
               Uri.https(
                 'us-central1-invoice-c63dc.cloudfunctions.net',
                 '/api/v1/bl_objects/user',
               ),
               headers: {"Content-Type": "application/json"},
               body: body,
-              encoding: null
-          ),
+              encoding: null),
         ).called(1);
       });
 
@@ -81,13 +76,15 @@ void main() {
     "upsertedCount": 0,
     "matchedCount": 1
 }''');
-        UserDTOSend fakeUser = MockUserDTOSend();
+        UserDTO fakeUser = MockUserDTO();
         when(fakeUser.toJson).thenReturn({});
         final body = jsonEncode(fakeUser.toJson());
 
-        when(() => httpClient.put(any(), body: body, headers: {"Content-Type":"application/json"})).thenAnswer((_) async => response);
+        when(() => httpClient.put(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
         expect(
-              () async => userApiClient.updateUser(fakeUser),
+          () async => userApiClient.updateUser(fakeUser),
           throwsA(isA<Exception>()),
         );
       });
@@ -98,18 +95,19 @@ void main() {
         when(() => response.body).thenReturn('''{
     "error on updating user"
 }''');
-        UserDTOSend fakeUser = MockUserDTOSend();
+        UserDTO fakeUser = MockUserDTO();
         when(fakeUser.toJson).thenReturn({});
         final body = jsonEncode(fakeUser.toJson());
 
-        when(() => httpClient.put(any(),body: body,headers: {"Content-Type":"application/json"})).thenAnswer((_) async => response);
+        when(() => httpClient.put(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
         expect(
-              () async => userApiClient.updateUser(fakeUser),
+          () async => userApiClient.updateUser(fakeUser),
           throwsA(isA<Exception>()),
         );
       });
-    }
-    );
+    });
 
     group('user insert', () {
       test('makes correct http request', () async {
@@ -120,21 +118,20 @@ void main() {
         "insertedId": "62e393a5fb12b967fea3d9d0"
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
-        UserDTOSend fakeUser = MockUserDTOSend();
+        UserDTO fakeUser = MockUserDTO();
         when(fakeUser.toJson).thenReturn({});
         final body = jsonEncode(fakeUser.toJson());
         try {
           await userApiClient.insertUser(fakeUser);
         } catch (_) {}
         verify(
-              () => httpClient.put(
+          () => httpClient.put(
               Uri.https(
                 'us-central1-invoice-c63dc.cloudfunctions.net',
                 '/api/v1/bl_objects/user',
               ),
               body: body,
-              headers: {"Content-Type": "application/json"}
-          ),
+              headers: {"Content-Type": "application/json"}),
         ).called(1);
       });
       test('inserts user, id gets extracted correctly', () async {
@@ -144,10 +141,12 @@ void main() {
         "acknowledged": true,
         "insertedId": "62e393a5fb12b967fea3d9d0"
 }''');
-        UserDTOSend fakeUser = MockUserDTOSend();
+        UserDTO fakeUser = MockUserDTO();
         when(fakeUser.toJson).thenReturn({});
         final body = jsonEncode(fakeUser.toJson());
-        when(() => httpClient.post(any(), body: body, headers: {"Content-Type": "application/json"})).thenAnswer((_) async => response);
+        when(() => httpClient.post(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
 
         String id = "62e393a5fb12b967fea3d9d0";
         try {
@@ -162,17 +161,18 @@ void main() {
         when(() => response.body).thenReturn('''{
     "error on inserting user"
 }''');
-        UserDTOSend fakeUser = MockUserDTOSend();
+        UserDTO fakeUser = MockUserDTO();
         when(fakeUser.toJson).thenReturn({});
         final body = jsonEncode(fakeUser.toJson());
-        when(() => httpClient.put(any(),body: body, headers: {"Content-Type": "application/json"} )).thenAnswer((_) async => response);
+        when(() => httpClient.put(any(),
+                body: body, headers: {"Content-Type": "application/json"}))
+            .thenAnswer((_) async => response);
         expect(
-              () async => userApiClient.insertUser(fakeUser),
+          () async => userApiClient.insertUser(fakeUser),
           throwsA(isA<Exception>()),
         );
       });
-    }
-    );
+    });
 
     group('userSearch', () {
       const id = 'mock-query';
@@ -185,11 +185,9 @@ void main() {
           await userApiClient.getUserById(id);
         } catch (_) {}
         verify(
-              () => httpClient.get(
-            Uri.https(
-                'us-central1-invoice-c63dc.cloudfunctions.net',
-                '/api/v1/bl_objects/user/$id'
-            ),
+          () => httpClient.get(
+            Uri.https('us-central1-invoice-c63dc.cloudfunctions.net',
+                '/api/v1/bl_objects/user/$id'),
           ),
         ).called(1);
       });
@@ -203,19 +201,15 @@ void main() {
           await userApiClient.getUsers({});
         } catch (_) {}
         verify(
-              () => httpClient.get(
-            Uri.https(
-                'us-central1-invoice-c63dc.cloudfunctions.net',
-                '/api/v1/bl_objects/user',
-                {}
-            ),
+          () => httpClient.get(
+            Uri.https('us-central1-invoice-c63dc.cloudfunctions.net',
+                '/api/v1/bl_objects/user', {}),
           ),
         ).called(1);
       });
 
-
-
-      test('getUserById throws UserIdRequestFailure on non-200 response', () async {
+      test('getUserById throws UserIdRequestFailure on non-200 response',
+          () async {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(400);
         when(() => response.body).thenReturn('''{
@@ -223,7 +217,7 @@ void main() {
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         expect(
-              () async => userApiClient.getUserById(id),
+          () async => userApiClient.getUserById(id),
           throwsA(isA<UserIdRequestFailure>()),
         );
       });
@@ -236,7 +230,7 @@ void main() {
 }''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         expect(
-              () async => userApiClient.getUsers({}),
+          () async => userApiClient.getUsers({}),
           throwsA(isA<Exception>()),
         );
       });
@@ -247,7 +241,7 @@ void main() {
         when(() => response.body).thenReturn(
           '''
 {
-    "_id": "62e393a5fb12b967fea3d9d0",
+    "id": "62e393a5fb12b967fea3d9d0",
     "billingInformation": {
         "streetName": "streetName",
         "streetNumber": "streetNumber",
@@ -279,20 +273,37 @@ void main() {
         final actual = await userApiClient.getUserById(id);
 
         expect(
-          actual,
-          isA<UserDTOReceive>()
-              .having((l) => l.hasPremium, 'hasPremium', false)
-              .having((l) => l.originalTransactionId, 'originalTransactionId', '')
-              .having((l) => l.purchaseToken, 'purchaseToken', [])
-              .having((l) => l.subscriptionExpirationDate, 'subscriptionExpirationDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.name, 'name', 'abcedfghijklmnopqrstuvwxyztest')
-              .having((l) => l.id, 'id', '62e393a5fb12b967fea3d9d0')
-              .having((l) => l.email, 'email', 'demarcus@gmx.de')
-              .having((l) => l.locale, 'locale', Locale.DE)
-              .having((l) => l.billingInformation, 'billingInformation', BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"))
-              .having((l) => l.creationDate, 'creationDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.modifiedDate, 'modifiedDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-        );
+            actual,
+            isA<UserDTO>()
+                .having((l) => l.hasPremium, 'hasPremium', false)
+                .having(
+                    (l) => l.originalTransactionId, 'originalTransactionId', '')
+                .having((l) => l.purchaseToken, 'purchaseToken', [])
+                .having(
+                    (l) => l.subscriptionExpirationDate,
+                    'subscriptionExpirationDate',
+                    DateTime.parse("2022-08-11T09:12:11.524Z"))
+                .having((l) => l.name, 'name', 'abcedfghijklmnopqrstuvwxyztest')
+                .having((l) => l.id, 'id', '62e393a5fb12b967fea3d9d0')
+                .having((l) => l.email, 'email', 'demarcus@gmx.de')
+                .having((l) => l.locale, 'locale', Locale.DE)
+                .having(
+                    (l) => l.billingInformation,
+                    'billingInformation',
+                    BillingInformation(
+                        taxNumber: "5474352354",
+                        germanUstId: "123423634623",
+                        streetName: "streetName",
+                        paymentInformation: PaymentInformation(
+                            details: 'rerwerwerwe', type: 'other'),
+                        streetNumber: "streetNumber",
+                        postalCode: "435234",
+                        city: "city",
+                        phoneNumber: "4353475323423"))
+                .having((l) => l.creationDate, 'creationDate',
+                    DateTime.parse("2022-08-11T09:12:11.524Z"))
+                .having((l) => l.modifiedDate, 'modifiedDate',
+                    DateTime.parse("2022-08-11T09:12:11.524Z")));
       });
 
       test('getUsers returns list of users on valid response', () async {
@@ -302,7 +313,7 @@ void main() {
           '''
 {
     "data": [{
-        "_id": "62e393a5fb12b967fea3d9d0",
+        "id": "62e393a5fb12b967fea3d9d0",
     "billingInformation": {
         "streetName": "streetName",
         "streetNumber": "streetNumber",
@@ -337,20 +348,37 @@ void main() {
         final actual = await userApiClient.getUsers({});
         print(actual);
         expect(
-          actual["userList"][0],
-          isA<UserDTOReceive>()
-              .having((l) => l.hasPremium, 'hasPremium', false)
-              .having((l) => l.originalTransactionId, 'originalTransactionId', '')
-              .having((l) => l.purchaseToken, 'purchaseToken', [])
-              .having((l) => l.subscriptionExpirationDate, 'subscriptionExpirationDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.name, 'name', 'abcedfghijklmnopqrstuvwxyztest')
-              .having((l) => l.id, 'id', '62e393a5fb12b967fea3d9d0')
-              .having((l) => l.email, 'email', 'demarcus@gmx.de')
-              .having((l) => l.locale, 'locale', Locale.DE)
-              .having((l) => l.billingInformation, 'billingInformation', BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"))
-              .having((l) => l.creationDate, 'creationDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-              .having((l) => l.modifiedDate, 'modifiedDate', DateTime.parse("2022-08-11T09:12:11.524Z"))
-        );
+            actual["userList"][0],
+            isA<UserDTO>()
+                .having((l) => l.hasPremium, 'hasPremium', false)
+                .having(
+                    (l) => l.originalTransactionId, 'originalTransactionId', '')
+                .having((l) => l.purchaseToken, 'purchaseToken', [])
+                .having(
+                    (l) => l.subscriptionExpirationDate,
+                    'subscriptionExpirationDate',
+                    DateTime.parse("2022-08-11T09:12:11.524Z"))
+                .having((l) => l.name, 'name', 'abcedfghijklmnopqrstuvwxyztest')
+                .having((l) => l.id, 'id', '62e393a5fb12b967fea3d9d0')
+                .having((l) => l.email, 'email', 'demarcus@gmx.de')
+                .having((l) => l.locale, 'locale', Locale.DE)
+                .having(
+                    (l) => l.billingInformation,
+                    'billingInformation',
+                    BillingInformation(
+                        taxNumber: "5474352354",
+                        germanUstId: "123423634623",
+                        streetName: "streetName",
+                        paymentInformation: PaymentInformation(
+                            details: 'rerwerwerwe', type: 'other'),
+                        streetNumber: "streetNumber",
+                        postalCode: "435234",
+                        city: "city",
+                        phoneNumber: "4353475323423"))
+                .having((l) => l.creationDate, 'creationDate',
+                    DateTime.parse("2022-08-11T09:12:11.524Z"))
+                .having((l) => l.modifiedDate, 'modifiedDate',
+                    DateTime.parse("2022-08-11T09:12:11.524Z")));
       });
     });
   });

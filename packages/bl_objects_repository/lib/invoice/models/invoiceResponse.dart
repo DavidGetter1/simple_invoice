@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:invoice_api_client/invoice_api_client.dart';
 
 class InvoiceResponse extends Equatable {
-  final List<Invoice> invoiceList;
+  final List<InvoiceDTO> invoiceList;
   final int lastN;
   InvoiceResponse({required this.invoiceList, required this.lastN});
 

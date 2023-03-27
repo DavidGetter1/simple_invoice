@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'itemDTOReceive.dart';
+import 'itemDTO.dart';
 part 'detailedItem.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class DetailedItem extends Equatable {
-  const DetailedItem( {
+  const DetailedItem({
     required this.quantity,
     required this.quantityIdentifier,
     required this.id,
@@ -15,25 +15,23 @@ class DetailedItem extends Equatable {
   final double quantity;
   final String quantityIdentifier;
   final String id;
-  final ItemDTOReceive? item;
+  final ItemDTO? item;
 
   factory DetailedItem.fromJson(Map<String, dynamic> json) =>
       _$DetailedItemFromJson(json);
 
   Map<String, dynamic> toJson() => _$DetailedItemToJson(this);
 
-  DetailedItem copyWth({
-    double? quantity,
-    String? quantityIdentifier,
-    String? id,
-    ItemDTOReceive? item
-  }){
+  DetailedItem copyWth(
+      {double? quantity,
+      String? quantityIdentifier,
+      String? id,
+      ItemDTO? item}) {
     return DetailedItem(
         quantity: quantity ?? this.quantity,
         id: id ?? this.id,
         quantityIdentifier: quantityIdentifier ?? this.quantityIdentifier,
-        item: item ?? this.item
-    );
+        item: item ?? this.item);
   }
 
   @override

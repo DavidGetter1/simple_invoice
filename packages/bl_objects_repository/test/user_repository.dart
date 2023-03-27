@@ -2,15 +2,15 @@
 import 'package:invoice_api_client/invoice_api_client.dart' as invoice_api;
 import 'package:bl_objects_repository/user/index.dart';
 import 'package:invoice_api_client/invoice_api_client.dart';
-import 'package:invoice_api_client/users/models/userDTOReceive.dart';
+import 'package:invoice_api_client/users/models/userDTO.dart';
 import 'package:invoice_api_client/users/models/userDTOSend.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
-class MockUserApiClient extends Mock
-    implements invoice_api.UserApiClient {}
+class MockUserApiClient extends Mock implements invoice_api.UserApiClient {}
 
-class MockUserDTOReceive extends Mock implements invoice_api.UserDTOReceive { }
+class MockUserDTOReceive extends Mock implements invoice_api.UserDTOReceive {}
+
 void main() {
   group('UserRepository', () {
     late invoice_api.UserApiClient userApiClient;
@@ -52,18 +52,27 @@ void main() {
         final user = UserDTOReceive(
             id: '62e393a5fb12b967fea3d9d0',
             name: "sigmund",
-            billingInformation: BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"),
+            billingInformation: BillingInformation(
+                taxNumber: "5474352354",
+                germanUstId: "123423634623",
+                streetName: "streetName",
+                paymentInformation:
+                    PaymentInformation(details: 'rerwerwerwe', type: 'other'),
+                streetNumber: "streetNumber",
+                postalCode: "435234",
+                city: "city",
+                phoneNumber: "4353475323423"),
             locale: Locale.DE,
             email: "g@g.com",
             creationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
             purchaseToken: ["daweef32r34t45t23e23e"],
             hasPremium: false,
             originalTransactionId: "originalTransactionId",
-            subscriptionExpirationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
-            modifiedDate: DateTime.parse("2022-08-11T09:12:11.524Z")
-        );
+            subscriptionExpirationDate:
+                DateTime.parse("2022-08-11T09:12:11.524Z"),
+            modifiedDate: DateTime.parse("2022-08-11T09:12:11.524Z"));
         when(() => userApiClient.getUserById(any())).thenAnswer(
-              (_) async => user,
+          (_) async => user,
         );
         final actual = await userRepository.getUser(id);
         expect(
@@ -71,19 +80,27 @@ void main() {
           UserDTOReceive(
               id: '62e393a5fb12b967fea3d9d0',
               name: "sigmund",
-              billingInformation: BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"),
+              billingInformation: BillingInformation(
+                  taxNumber: "5474352354",
+                  germanUstId: "123423634623",
+                  streetName: "streetName",
+                  paymentInformation:
+                      PaymentInformation(details: 'rerwerwerwe', type: 'other'),
+                  streetNumber: "streetNumber",
+                  postalCode: "435234",
+                  city: "city",
+                  phoneNumber: "4353475323423"),
               locale: Locale.DE,
               email: "g@g.com",
               creationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
               purchaseToken: ["daweef32r34t45t23e23e"],
               hasPremium: false,
               originalTransactionId: "originalTransactionId",
-              subscriptionExpirationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
-              modifiedDate: DateTime.parse("2022-08-11T09:12:11.524Z")
-          ),
+              subscriptionExpirationDate:
+                  DateTime.parse("2022-08-11T09:12:11.524Z"),
+              modifiedDate: DateTime.parse("2022-08-11T09:12:11.524Z")),
         );
       });
-
     });
     group('getUsers', () {
       const id = 'mock-query';
@@ -98,48 +115,77 @@ void main() {
         final user = UserDTOReceive(
             id: '62e393a5fb12b967fea3d9d0',
             name: "sigmund",
-            billingInformation: BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"),
+            billingInformation: BillingInformation(
+                taxNumber: "5474352354",
+                germanUstId: "123423634623",
+                streetName: "streetName",
+                paymentInformation:
+                    PaymentInformation(details: 'rerwerwerwe', type: 'other'),
+                streetNumber: "streetNumber",
+                postalCode: "435234",
+                city: "city",
+                phoneNumber: "4353475323423"),
             locale: Locale.DE,
             email: "g@g.com",
             creationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
             purchaseToken: ["daweef32r34t45t23e23e"],
             hasPremium: false,
             originalTransactionId: "originalTransactionId",
-            subscriptionExpirationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
-            modifiedDate: DateTime.parse("2022-08-11T09:12:11.524Z")
-        );
+            subscriptionExpirationDate:
+                DateTime.parse("2022-08-11T09:12:11.524Z"),
+            modifiedDate: DateTime.parse("2022-08-11T09:12:11.524Z"));
         when(() => userApiClient.getUsers({})).thenAnswer(
-              (_) async => {"userList": [user], "lastN": 1},
+          (_) async => {
+            "userList": [user],
+            "lastN": 1
+          },
         );
         final actual = await userRepository.getUsers({});
         expect(
             actual,
-            UserResponse(userList: [UserDTOReceive(
-                id: '62e393a5fb12b967fea3d9d0',
-                name: "sigmund",
-                billingInformation: BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"),
-                locale: Locale.DE,
-                email: "g@g.com",
-                creationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
-                purchaseToken: ["daweef32r34t45t23e23e"],
-                hasPremium: false,
-                originalTransactionId: "originalTransactionId",
-                subscriptionExpirationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
-                modifiedDate: DateTime.parse("2022-08-11T09:12:11.524Z")
-            )],
-                lastN: 1)
-        );
+            UserResponse(userList: [
+              UserDTOReceive(
+                  id: '62e393a5fb12b967fea3d9d0',
+                  name: "sigmund",
+                  billingInformation: BillingInformation(
+                      taxNumber: "5474352354",
+                      germanUstId: "123423634623",
+                      streetName: "streetName",
+                      paymentInformation: PaymentInformation(
+                          details: 'rerwerwerwe', type: 'other'),
+                      streetNumber: "streetNumber",
+                      postalCode: "435234",
+                      city: "city",
+                      phoneNumber: "4353475323423"),
+                  locale: Locale.DE,
+                  email: "g@g.com",
+                  creationDate: DateTime.parse("2022-08-11T09:12:11.524Z"),
+                  purchaseToken: ["daweef32r34t45t23e23e"],
+                  hasPremium: false,
+                  originalTransactionId: "originalTransactionId",
+                  subscriptionExpirationDate:
+                      DateTime.parse("2022-08-11T09:12:11.524Z"),
+                  modifiedDate: DateTime.parse("2022-08-11T09:12:11.524Z"))
+            ], lastN: 1));
       });
-
     });
     group('updateUser', () {
       final user = UserDTOSend(
-          id: '62e393a5fb12b967fea3d9d0',
-          name: "sigmund",
-          billingInformation: BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"),
-          locale: Locale.DE,
-          email: "g@g.com",
-          hasPremium: false,
+        id: '62e393a5fb12b967fea3d9d0',
+        name: "sigmund",
+        billingInformation: BillingInformation(
+            taxNumber: "5474352354",
+            germanUstId: "123423634623",
+            streetName: "streetName",
+            paymentInformation:
+                PaymentInformation(details: 'rerwerwerwe', type: 'other'),
+            streetNumber: "streetNumber",
+            postalCode: "435234",
+            city: "city",
+            phoneNumber: "4353475323423"),
+        locale: Locale.DE,
+        email: "g@g.com",
+        hasPremium: false,
       );
       test('calls update with correct user', () async {
         try {
@@ -152,11 +198,19 @@ void main() {
       final user = UserDTOSend(
           id: '62e393a5fb12b967fea3d9d0',
           name: "sigmund",
-          billingInformation: BillingInformation(taxNumber: "5474352354", germanUstId: "123423634623", streetName: "streetName", paymentInformation: PaymentInformation(details: 'rerwerwerwe', type: 'other'), streetNumber: "streetNumber", postalCode: "435234", city: "city", phoneNumber: "4353475323423"),
+          billingInformation: BillingInformation(
+              taxNumber: "5474352354",
+              germanUstId: "123423634623",
+              streetName: "streetName",
+              paymentInformation:
+                  PaymentInformation(details: 'rerwerwerwe', type: 'other'),
+              streetNumber: "streetNumber",
+              postalCode: "435234",
+              city: "city",
+              phoneNumber: "4353475323423"),
           locale: Locale.DE,
           email: "g@g.com",
-          hasPremium: false
-      );
+          hasPremium: false);
       test('calls insert with correct user', () async {
         try {
           await userRepository.insertUser(user);

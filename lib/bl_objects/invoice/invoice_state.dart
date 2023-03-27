@@ -1,4 +1,3 @@
-
 part of 'invoice_cubit.dart';
 
 abstract class InvoiceState extends Equatable {
@@ -19,8 +18,7 @@ class InvoiceUpdatedState extends InvoiceState {}
 class NoMoreResultsState extends InvoiceState {}
 
 @JsonSerializable()
-class InvoiceCreatedState extends InvoiceState{
-
+class InvoiceCreatedState extends InvoiceState {
   final String id;
   const InvoiceCreatedState({required this.id});
 
@@ -32,7 +30,7 @@ class InvoiceCreatedState extends InvoiceState{
 
 @JsonSerializable(explicitToJson: true)
 class InvoiceFetchedState extends InvoiceState {
-  final Invoice invoice;
+  final InvoiceDTO invoice;
   const InvoiceFetchedState({required this.invoice});
 
   factory InvoiceFetchedState.fromJson(Map<String, dynamic> json) =>
@@ -47,8 +45,9 @@ class InvoiceFetchedState extends InvoiceState {
 @JsonSerializable(explicitToJson: true)
 class InvoiceListFetchedState extends InvoiceState {
   final int lastN;
-  final List<Invoice> invoiceList;
-  const InvoiceListFetchedState({required this.invoiceList, required this.lastN});
+  final List<InvoiceDTO> invoiceList;
+  const InvoiceListFetchedState(
+      {required this.invoiceList, required this.lastN});
 
   factory InvoiceListFetchedState.fromJson(Map<String, dynamic> json) =>
       _$InvoiceListFetchedStateFromJson(json);
@@ -69,4 +68,3 @@ class FailureState extends InvoiceState {
 
   Map<String, dynamic> toJson() => _$FailureStateToJson(this);
 }
-

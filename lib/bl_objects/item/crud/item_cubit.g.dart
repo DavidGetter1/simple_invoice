@@ -6,19 +6,9 @@ part of 'item_cubit.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-ItemCreatedState _$ItemCreatedStateFromJson(Map<String, dynamic> json) =>
-    ItemCreatedState(
-      id: json['id'] as String,
-    );
-
-Map<String, dynamic> _$ItemCreatedStateToJson(ItemCreatedState instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-    };
-
 ItemFetchedState _$ItemFetchedStateFromJson(Map<String, dynamic> json) =>
     ItemFetchedState(
-      item: ItemDTOReceive.fromJson(json['item'] as Map<String, dynamic>),
+      item: Item.fromJson(json['item'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$ItemFetchedStateToJson(ItemFetchedState instance) =>
@@ -26,19 +16,17 @@ Map<String, dynamic> _$ItemFetchedStateToJson(ItemFetchedState instance) =>
       'item': instance.item.toJson(),
     };
 
-ItemListFetchedState _$ItemListFetchedStateFromJson(
+OperationCompletedState _$OperationCompletedStateFromJson(
         Map<String, dynamic> json) =>
-    ItemListFetchedState(
+    OperationCompletedState(
       itemList: (json['itemList'] as List<dynamic>)
-          .map((e) => ItemDTOReceive.fromJson(e as Map<String, dynamic>))
+          .map((e) => Item.fromJson(e as Map<String, dynamic>))
           .toList(),
-      lastN: json['lastN'] as int,
     );
 
-Map<String, dynamic> _$ItemListFetchedStateToJson(
-        ItemListFetchedState instance) =>
+Map<String, dynamic> _$OperationCompletedStateToJson(
+        OperationCompletedState instance) =>
     <String, dynamic>{
-      'lastN': instance.lastN,
       'itemList': instance.itemList.map((e) => e.toJson()).toList(),
     };
 
