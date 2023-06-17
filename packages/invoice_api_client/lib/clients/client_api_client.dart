@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'models/client.dart';
+import 'models/client_response.dart';
 
 /// Exception thrown when locationSearch fails.
 class ClientIdRequestFailure implements Exception {
@@ -23,16 +24,16 @@ class ClientApiClient {
   // also if you doing it locally, change the Uri.https to http if needed.
   // the path looks like this then: '/invoice-c63dc/us-central1/ms_bl_objects/v1/bl_objects/client
   // when deploying its simply '/v1/bl_objects/client'
-  static const _baseUrl = 'us-central1-invoice-c63dc.cloudfunctions.net';
+  static const _baseUrl =
+      '192.168.2.110:5001/invoice-c63dc/us-central1/ms_bl_objects';
   final http.Client _httpClient;
 
   /**
    * Deletes an [Client] by ID.
    */
   deleteClient(String id) async {
-    final clientRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/client/$id',
+    final clientRequest = Uri.parse(
+      'http://' + _baseUrl + '/v1/bl_objects/client/$id',
     );
     final clientResponse = await _httpClient.delete(clientRequest);
     print(clientResponse.body);
@@ -70,6 +71,7 @@ class ClientApiClient {
       Client client = Client.fromJson(clientJson as Map<String, dynamic>);
       return client;
     } catch (e) {
+      print("Error in getClientById");
       print(e.toString());
     }
   }
@@ -78,9 +80,11 @@ class ClientApiClient {
    * Queries the DB for clients.
    */
   dynamic getClients(Map<String, String> query) async {
-    final clientRequest =
-        Uri.https(_baseUrl, '/api/v1/bl_objects/client', query);
+    String stringifiedQuery = Uri(queryParameters: query).query;
+    final clientRequest = Uri.parse(
+        'http://' + _baseUrl + '/v1/bl_objects/client?$stringifiedQuery');
     final clientResponse = await _httpClient.get(clientRequest);
+    print("am in getclients");
     print(clientResponse.body);
     if (clientResponse.statusCode != 200) {
       throw new Exception(clientResponse.body);
@@ -93,8 +97,11 @@ class ClientApiClient {
     try {
       List<Client> clientList = List<Client>.from(
           clientJson["data"].map((client) => Client.fromJson(client)).toList());
-      return {"clientList": clientList, "lastN": clientJson["lastN"]};
+      ClientResponse clientResponse =
+          ClientResponse(clientList: clientList, lastN: clientJson["lastN"]);
+      return clientResponse;
     } catch (e) {
+      print("Error in getClients");
       print(e.toString());
     }
   }
@@ -103,27 +110,35 @@ class ClientApiClient {
    * Inserts the [Client] into the DB.
    */
   insertClient(Client client) async {
-    final clientRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/client',
+    print("am in insertClient");
+    final clientRequest = Uri.parse(
+      'http://' + _baseUrl + '/v1/bl_objects/client',
     );
+    print("after clientRequest");
     String clientJson = jsonEncode(client.toJson());
-    final clientResponse = await _httpClient.put(clientRequest,
-        body: clientJson, headers: {"Content-Type": "application/json"});
-    if (clientResponse.statusCode != 201) {
-      throw Exception(clientResponse.body);
+    print("after clientJson");
+    print(clientJson);
+    try {
+      final clientResponse = await _httpClient.post(clientRequest,
+          body: clientJson, headers: {"Content-Type": "application/json"});
+      print("after clientResponse");
+      print(clientResponse.body);
+      if (clientResponse.statusCode != 201) {
+        throw Exception(clientResponse.body);
+      }
+      final decodedResponse = jsonDecode(clientResponse.body);
+      return decodedResponse["insertedId"];
+    } catch (e) {
+      print(e.toString());
     }
-    final decodedResponse = jsonDecode(clientResponse.body);
-    return decodedResponse["upsertedId"];
   }
 
   /**
    * Inserts the [Client] into the DB.
    */
   updateClient(Client client) async {
-    final clientRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/client',
+    final clientRequest = Uri.parse(
+      'http://' + _baseUrl + '/v1/bl_objects/client',
     );
     String clientJson = jsonEncode(client.toJson());
     final clientResponse = await _httpClient.put(clientRequest,

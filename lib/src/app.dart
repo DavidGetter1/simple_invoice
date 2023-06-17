@@ -1,9 +1,9 @@
 import 'package:authentication/authentication.dart';
 import 'package:bl_objects_repository/client/index.dart';
 import 'package:bl_objects_repository/invoice/repository.dart';
-import 'package:bl_objects_repository/item/models/item.dart';
 import 'package:bl_objects_repository/item/repository.dart';
 import 'package:bl_objects_repository/user/repository.dart';
+import 'package:easyinvoice/bl_objects/client/mutate/view/screens/client_create_screen.dart';
 import 'package:easyinvoice/settings/customize_invoice/view/customize_invoice_screen.dart';
 import 'package:easyinvoice/src/start.dart';
 import 'package:flutter/material.dart';
@@ -12,18 +12,23 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i18n_extension/i18n_widget.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:invoice_api_client/clients/models/client.dart';
+import 'package:invoice_api_client/items/models/item.dart';
 
 import '../authentication/authentication_bloc.dart';
-import '../bl_objects/client/client_cubit.dart';
-import '../bl_objects/invoice/view/screens/create_invoice_screen.dart';
+import '../bl_objects/client/mutate/client_mutate_cubit.dart';
+import '../bl_objects/client/query/client_query_cubit.dart';
+import '../bl_objects/client/query/view/screens/client_list_view.dart';
+import '../bl_objects/invoice/mutate/invoice_modify_cubit.dart';
+import '../bl_objects/invoice/mutate/view/create_invoice_screen.dart';
 import '../bl_objects/invoice/view/screens/invoice_detail_screen.dart';
-import '../bl_objects/item/crud/item_cubit.dart';
 import '../bl_objects/invoice/invoice_cubit.dart';
-import '../bl_objects/item/modify/item_modify_cubit.dart';
-import '../bl_objects/item/modify/view/item_modify_screen/item_modify_screen.dart';
-import '../bl_objects/item/view/detailed_view/screens/item_screen.dart';
-import '../bl_objects/user/user_cubit.dart';
+import '../bl_objects/item/mutate/item_modify_cubit.dart';
+import '../bl_objects/item/mutate/view/item_modify_screen/item_modify_screen.dart';
+import '../bl_objects/item/query/item_cubit.dart';
+import '../settings/account/profile/user_cubit.dart';
 import '../settings/account/login_tiles/view/login_tiles_screen.dart';
+import '../settings/account/profile/view/screens/profile_screen.dart';
 import '../settings/account/region/view/region.dart';
 import '../settings/main/language/language_cubit.dart';
 import '../settings/main/language/language_states.dart';
@@ -52,6 +57,12 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
+        path: '/client-list',
+        builder: (context, state) {
+          return I18n(child: const ClientListViewScreen());
+        },
+      ),
+      GoRoute(
         path: '/invoice-detail',
         builder: (BuildContext context, GoRouterState state) =>
             I18n(child: const InvoiceDetailScreen()),
@@ -61,9 +72,18 @@ class MyApp extends StatelessWidget {
         builder: (context, state) => I18n(child: const CreateInvoiceScreen()),
       ),
       GoRoute(
+        path: '/profile',
+        builder: (context, state) => I18n(child: const ProfileScreen()),
+      ),
+      GoRoute(
         path: '/create-item',
         builder: (context, state) =>
-            I18n(child: CreateItemScreen(item: state.extra as Item?)),
+            I18n(child: ModifyItemScreen(item: state.extra as Item?)),
+      ),
+      GoRoute(
+        path: '/create-client',
+        builder: (context, state) =>
+            I18n(child: ModifyClientScreen(client: state.extra as Client?)),
       ),
       GoRoute(
         path: '/login',
@@ -89,7 +109,9 @@ class MyApp extends StatelessWidget {
           RepositoryProvider.value(
               value: itemRepository
                 ..setAuthenticationRepository(authenticationRepository)),
-          RepositoryProvider.value(value: clientRepository),
+          RepositoryProvider.value(
+              value: clientRepository
+                ..setAuthenticationRepository(authenticationRepository)),
           RepositoryProvider.value(value: invoiceRepository),
           RepositoryProvider.value(
               value: userRepository
@@ -110,13 +132,21 @@ class MyApp extends StatelessWidget {
                 create: (BuildContext context) =>
                     ItemModifyCubit(context.read<ItemRepository>()),
               ),
-              BlocProvider<ClientCubit>(
+              BlocProvider<ClientQueryCubit>(
                 create: (BuildContext context) =>
-                    ClientCubit(context.read<ClientRepository>()),
+                    ClientQueryCubit(context.read<ClientRepository>()),
+              ),
+              BlocProvider<ClientMutateCubit>(
+                create: (BuildContext context) =>
+                    ClientMutateCubit(context.read<ClientRepository>()),
               ),
               BlocProvider<InvoiceCubit>(
                 create: (BuildContext context) =>
                     InvoiceCubit(context.read<InvoiceRepository>()),
+              ),
+              BlocProvider<InvoiceModifyCubit>(
+                create: (BuildContext context) =>
+                    InvoiceModifyCubit(context.read<InvoiceRepository>()),
               ),
               BlocProvider<UserCubit>(
                 lazy: false,
@@ -129,6 +159,7 @@ class MyApp extends StatelessWidget {
             ],
             child: BlocBuilder<I18nCubit, I18nState>(
               builder: (context, state) => MaterialApp.router(
+                routerConfig: _router,
                 locale: state.locale,
                 localizationsDelegates: const [
                   GlobalMaterialLocalizations.delegate,
@@ -139,8 +170,6 @@ class MyApp extends StatelessWidget {
                   Locale('en', "US"),
                   Locale('de', "DE"),
                 ],
-                routeInformationParser: _router.routeInformationParser,
-                routerDelegate: _router.routerDelegate,
                 title: 'Invoice',
                 theme: ThemeData(
                   textTheme: GoogleFonts.signikaNegativeTextTheme(),

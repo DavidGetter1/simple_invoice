@@ -11,11 +11,13 @@ dependencies:
   flutter:
     sdk: flutter
   equatable: ^2.0.3
+  objectid: ^2.1.0
   json_annotation: ^4.6.0
   invoice_api_client:
     path: ../invoice_api_client
   authentication:
     path: ../authentication
+
 
 dev_dependencies:
   flutter_test:

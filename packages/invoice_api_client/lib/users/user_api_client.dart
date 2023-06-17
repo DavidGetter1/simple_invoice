@@ -20,14 +20,14 @@ class UserApiClient {
   // when deploying its simply 'api/v1/bl_objects/user'
   // dont forget to adjust http correctly
   static const _baseUrl =
-      '10.0.2.2:5001/invoice-c63dc/us-central1/ms_bl_objects';
+      '192.168.2.110:5001/invoice-c63dc/us-central1/ms_bl_objects';
   final http.Client _httpClient;
 
   getOrCreateUser(String id) async {
     final userRequest = Uri.parse(
         'http://' + _baseUrl + '/v1/bl_objects/user_find_or_create/$id');
     final userResponse = await _httpClient.get(userRequest);
-
+    print(userResponse.body);
     if (userResponse.statusCode != 200) {
       throw UserIdRequestFailure(userResponse.body.toString());
     }
@@ -43,6 +43,7 @@ class UserApiClient {
       UserDTO user = UserDTO.fromJson(userJson as Map<String, dynamic>);
       return user;
     } catch (e) {
+      print("error in getOrCreateUser");
       print(e.toString());
     }
   }
@@ -93,6 +94,7 @@ class UserApiClient {
       UserDTO user = UserDTO.fromJson(userJson as Map<String, dynamic>);
       return user;
     } catch (e) {
+      print("error in getUserById");
       print(e.toString());
     }
   }
@@ -117,6 +119,7 @@ class UserApiClient {
           userJson["data"].map((user) => UserDTO.fromJson(user)).toList());
       return {"userList": userList, "lastN": userJson["lastN"]};
     } catch (e) {
+      print("error in getUsers");
       print(e.toString());
     }
   }
@@ -144,9 +147,8 @@ class UserApiClient {
    * Inserts the [UserDTO] into the DB.
    */
   updateUser(UserDTO user) async {
-    final userRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/user',
+    final userRequest = Uri.parse(
+      'http://' + _baseUrl + '/v1/bl_objects/user',
     );
     String userJson = jsonEncode(user.toJson());
     final userResponse = await _httpClient.put(userRequest,
@@ -154,11 +156,12 @@ class UserApiClient {
     if (userResponse.statusCode != 200) {
       throw Exception(userResponse.body);
     }
-
     final responseJson = jsonDecode(userResponse.body);
     final bool updated = responseJson["modifiedCount"] == 1;
     if (!updated) {
       throw new Exception('No users updated');
     }
   }
+
+  updateBillingInformation(String id, BillingInformation billingInformation) {}
 }

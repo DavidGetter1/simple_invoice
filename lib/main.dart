@@ -20,8 +20,8 @@ void main() async {
   await Firebase.initializeApp();
   runApp(MyApp(
       authenticationRepository: AuthenticationRepository(),
-      itemRepository: ItemRepository(),
+      itemRepository: ItemRepository(null),
       clientRepository: ClientRepository(),
-      invoiceRepository: InvoiceRepository(),
+      invoiceRepository: InvoiceRepository(null),
       userRepository: UserRepository()));
 }

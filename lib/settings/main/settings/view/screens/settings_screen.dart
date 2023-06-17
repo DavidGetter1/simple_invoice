@@ -15,7 +15,6 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(Localizations.localeOf(context));
     return Scaffold(
       appBar: AppBar(
         title: Text("Settings".i18n),
@@ -67,59 +66,64 @@ class SettingsScreen extends StatelessWidget {
                   color: Theme.of(context).primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12)),
             ),
-            Container(
-              margin: EdgeInsets.only(top: 16),
-              alignment: Alignment.centerLeft,
-              child: Text("Settings".i18n,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge
-                      ?.copyWith(fontWeight: FontWeight.bold)),
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 16),
-              alignment: Alignment.centerLeft,
-              child: Text("Account".i18n,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold)),
-            ),
-            ListTile(
-              tileColor: Colors.red,
-              onTap: () => context.push("/profile"),
-              title: Text("Profile".i18n),
-            ),
-            ListTile(
-              onTap: () => context.push("/login"),
-              title: Text("Login".i18n),
-            ),
-            ListTile(
-              onTap: () => context.push("/region"),
-              title: Text("Region".i18n),
-            ),
-            ListTile(
-              tileColor: Colors.red,
-              onTap: () => context.push("/notifications"),
-              title: Text("Notifications".i18n),
-            ),
-            ListTile(
-              tileColor: Colors.red,
-              onTap: () => context.push("/upgrade"),
-              title: Text("Upgrade".i18n),
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 16),
-              alignment: Alignment.centerLeft,
-              child: Text("Invoice".i18n,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold)),
-            ),
-            ListTile(
-              onTap: () => context.push("/customize-invoice"),
-              title: Text("Customize".i18n),
+            Expanded(
+              child: ListView(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: 16),
+                    alignment: Alignment.centerLeft,
+                    child: Text("Settings".i18n,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge
+                            ?.copyWith(fontWeight: FontWeight.bold)),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 16),
+                    alignment: Alignment.centerLeft,
+                    child: Text("Account".i18n,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold)),
+                  ),
+                  ListTile(
+                    onTap: () => context.push("/profile"),
+                    title: Text("Profile".i18n),
+                  ),
+                  ListTile(
+                    onTap: () => context.push("/login"),
+                    title: Text("Login".i18n),
+                  ),
+                  ListTile(
+                    onTap: () => context.push("/region"),
+                    title: Text("Region".i18n),
+                  ),
+                  ListTile(
+                    tileColor: Colors.red,
+                    onTap: () => context.push("/notifications"),
+                    title: Text("Notifications".i18n),
+                  ),
+                  ListTile(
+                    tileColor: Colors.red,
+                    onTap: () => context.push("/upgrade"),
+                    title: Text("Upgrade".i18n),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 16),
+                    alignment: Alignment.centerLeft,
+                    child: Text("Invoice".i18n,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold)),
+                  ),
+                  ListTile(
+                    onTap: () => context.push("/customize-invoice"),
+                    title: Text("Customize".i18n),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

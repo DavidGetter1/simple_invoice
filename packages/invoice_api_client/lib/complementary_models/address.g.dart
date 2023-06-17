@@ -13,18 +13,18 @@ Address _$AddressFromJson(Map<String, dynamic> json) => $checkedCreate(
       json,
       ($checkedConvert) {
         final val = Address(
-          streetName: $checkedConvert('streetName', (v) => v as String),
-          streetNumber: $checkedConvert('streetNumber', (v) => v as String),
-          zipCode: $checkedConvert('zipCode', (v) => v as String),
-          city: $checkedConvert('city', (v) => v as String),
-          state: $checkedConvert('state', (v) => v as String),
-          country: $checkedConvert('country', (v) => v as String),
-          creationDate: $checkedConvert(
-              'creationDate', (v) => DateTime.parse(v as String)),
+          streetName: $checkedConvert('streetName', (v) => v as String?),
+          streetNumber: $checkedConvert('streetNumber', (v) => v as String?),
+          zipCode: $checkedConvert('zipCode', (v) => v as String?),
+          city: $checkedConvert('city', (v) => v as String?),
+          state: $checkedConvert('state', (v) => v as String?),
+          country: $checkedConvert('country', (v) => v as String?),
+          creationDate: $checkedConvert('creationDate',
+              (v) => v == null ? null : DateTime.parse(v as String)),
           modifiedDates: $checkedConvert(
               'modifiedDates',
-              (v) => (v as List<dynamic>)
-                  .map((e) => DateTime.parse(e as String))
+              (v) => (v as List<dynamic>?)
+                  ?.map((e) => DateTime.parse(e as String))
                   .toList()),
         );
         return val;
@@ -38,7 +38,7 @@ Map<String, dynamic> _$AddressToJson(Address instance) => <String, dynamic>{
       'city': instance.city,
       'state': instance.state,
       'country': instance.country,
-      'creationDate': instance.creationDate.toIso8601String(),
+      'creationDate': instance.creationDate?.toIso8601String(),
       'modifiedDates':
-          instance.modifiedDates.map((e) => e.toIso8601String()).toList(),
+          instance.modifiedDates?.map((e) => e.toIso8601String()).toList(),
     };

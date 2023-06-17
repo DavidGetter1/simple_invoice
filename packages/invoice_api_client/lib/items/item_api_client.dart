@@ -1,20 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:invoice_api_client/api_client/api_client.dart';
 import 'package:invoice_api_client/invoice_api_client.dart';
 
-/// Exception thrown when locationSearch fails.
+import '../entity/entity.dart';
+import '../response/response.dart';
+
 class ItemIdRequestFailure implements Exception {
   String message;
   ItemIdRequestFailure(this.message);
 }
 
-/// {@template meta_weather_api_client}
-/// Dart API Client which wraps the [MetaWeather API](http://www.metaweather.com/api/).
-/// {@endtemplate}
-class ItemApiClient {
-  /// {@macro meta_weather_api_client}
+class ItemApiClient extends ApiClient<Item> {
   ItemApiClient({http.Client? httpClient})
       : _httpClient = httpClient ?? http.Client();
   // If you want to test it locally, then the _baseUrl is = 'localhost:5001' for example
@@ -24,13 +24,14 @@ class ItemApiClient {
   // when deploying its simply 'api/v1/bl_objects/item'
   // dont forget to adjust http correctly
   static const _baseUrl =
-      '10.0.2.2:5001/invoice-c63dc/us-central1/ms_bl_objects';
+      '192.168.2.110:5001/invoice-c63dc/us-central1/ms_bl_objects';
   final http.Client _httpClient;
 
   /**
-   * Deletes an [ItemDTOReceive] by ID.
+   * Deletes an [ItemReceive] by ID.
    */
-  deleteItem(String id) async {
+  @override
+  delete(String id) async {
     final itemRequest = Uri.parse(
       'http://' + _baseUrl + '/v1/bl_objects/item/$id',
     );
@@ -48,9 +49,10 @@ class ItemApiClient {
   }
 
   /**
-   * Fetches an [ItemDTOReceive] by ID.
+   * Fetches an [ItemReceive] by ID.
    */
-  dynamic getItemById(String id) async {
+  @override
+  dynamic getById(String id) async {
     final itemRequest = Uri.parse(
       'http://' + _baseUrl + '/api/v1/bl_objects/item/$id',
     );
@@ -65,9 +67,10 @@ class ItemApiClient {
     }
 
     try {
-      ItemDTO item = ItemDTO.fromJson(itemJson as Map<String, dynamic>);
+      Item item = Item.fromJson(itemJson as Map<String, dynamic>);
       return item;
     } catch (e) {
+      print("error in getItemById");
       print(e.toString());
     }
   }
@@ -75,11 +78,18 @@ class ItemApiClient {
   /**
    * Queries the DB for items.
    */
-  dynamic getItems(Map<String, String> query) async {
+  @override
+  dynamic get(Map<String, String> query) async {
     String stringifiedQuery = Uri(queryParameters: query).query;
+
     final itemRequest = Uri.parse(
         'http://' + _baseUrl + '/v1/bl_objects/item?$stringifiedQuery');
+
+    print("hey im fetching items");
     final itemResponse = await _httpClient.get(itemRequest);
+
+    print(itemResponse.body);
+
     if (itemResponse.statusCode != 200) {
       throw new Exception(itemResponse.body);
     }
@@ -88,18 +98,22 @@ class ItemApiClient {
       throw new Exception('No items found');
     }
     try {
-      List<ItemDTO> itemList = List<ItemDTO>.from(
-          itemJson["data"].map((item) => ItemDTO.fromJson(item)).toList());
-      return ItemResponse(itemList: itemList, lastN: itemJson["lastN"]);
+      List<Item> itemList = List<Item>.from(
+          itemJson["data"].map((item) => Item.fromJson(item)).toList());
+      return Response<Item>(list: itemList, lastN: itemJson["lastN"]);
     } catch (e) {
+      print("error in getItems");
+
       print(e.toString());
     }
   }
 
   /**
-   * Inserts the [ItemDTOReceive] into the DB.
+   * Inserts the [ItemReceive] into the DB.
    */
-  insertItem(ItemDTO item) async {
+  @override
+  insert(Item item) async {
+    print(item.toJson());
     final itemRequest = Uri.parse('http://' + _baseUrl + '/v1/bl_objects/item');
     String itemJson = jsonEncode(item.toJson());
     final itemResponse = await _httpClient.post(itemRequest,
@@ -113,9 +127,10 @@ class ItemApiClient {
   }
 
   /**
-   * Inserts the [ItemDTOReceive] into the DB.
+   * Inserts the [ItemReceive] into the DB.
    */
-  updateItem(ItemDTO item) async {
+  @override
+  update(Item item) async {
     final itemRequest = Uri.parse('http://' + _baseUrl + '/v1/bl_objects/item');
     print(item.toJson());
     String itemJson = jsonEncode(item.toJson());

@@ -13,19 +13,20 @@ Client _$ClientFromJson(Map<String, dynamic> json) => $checkedCreate(
       json,
       ($checkedConvert) {
         final val = Client(
-          userId: $checkedConvert('userId', (v) => v as String),
-          name: $checkedConvert('name', (v) => v as String),
-          streetName: $checkedConvert('streetName', (v) => v as String),
-          streetNumber: $checkedConvert('streetNumber', (v) => v as String),
-          postalCode: $checkedConvert('postalCode', (v) => v as String),
-          city: $checkedConvert('city', (v) => v as String),
-          phoneNumber: $checkedConvert('phoneNumber', (v) => v as String),
-          email: $checkedConvert('email', (v) => v as String),
-          creationDate: $checkedConvert(
-              'creationDate', (v) => DateTime.parse(v as String)),
-          modifiedDate: $checkedConvert(
-              'modifiedDate', (v) => DateTime.parse(v as String)),
-          id: $checkedConvert('id', (v) => v as String),
+          userId: $checkedConvert('userId', (v) => v as String?),
+          name: $checkedConvert('name', (v) => v as String?),
+          address: $checkedConvert(
+              'address',
+              (v) => v == null
+                  ? null
+                  : Address.fromJson(v as Map<String, dynamic>)),
+          phoneNumber: $checkedConvert('phoneNumber', (v) => v as String?),
+          email: $checkedConvert('email', (v) => v as String?),
+          creationDate: $checkedConvert('creationDate',
+              (v) => v == null ? null : DateTime.parse(v as String)),
+          modifiedDate: $checkedConvert('modifiedDate',
+              (v) => v == null ? null : DateTime.parse(v as String)),
+          id: $checkedConvert('id', (v) => v as String?),
         );
         return val;
       },
@@ -35,12 +36,9 @@ Map<String, dynamic> _$ClientToJson(Client instance) => <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,
       'name': instance.name,
-      'streetName': instance.streetName,
-      'streetNumber': instance.streetNumber,
-      'postalCode': instance.postalCode,
-      'city': instance.city,
+      'address': instance.address?.toJson(),
       'phoneNumber': instance.phoneNumber,
       'email': instance.email,
-      'creationDate': instance.creationDate.toIso8601String(),
-      'modifiedDate': instance.modifiedDate.toIso8601String(),
+      'creationDate': instance.creationDate?.toIso8601String(),
+      'modifiedDate': instance.modifiedDate?.toIso8601String(),
     };

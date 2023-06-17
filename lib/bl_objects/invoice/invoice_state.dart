@@ -30,7 +30,7 @@ class InvoiceCreatedState extends InvoiceState {
 
 @JsonSerializable(explicitToJson: true)
 class InvoiceFetchedState extends InvoiceState {
-  final InvoiceDTO invoice;
+  final Invoice invoice;
   const InvoiceFetchedState({required this.invoice});
 
   factory InvoiceFetchedState.fromJson(Map<String, dynamic> json) =>
@@ -45,7 +45,7 @@ class InvoiceFetchedState extends InvoiceState {
 @JsonSerializable(explicitToJson: true)
 class InvoiceListFetchedState extends InvoiceState {
   final int lastN;
-  final List<InvoiceDTO> invoiceList;
+  final List<Invoice> invoiceList;
   const InvoiceListFetchedState(
       {required this.invoiceList, required this.lastN});
 

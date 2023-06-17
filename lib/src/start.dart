@@ -1,7 +1,8 @@
+import 'package:easyinvoice/bl_objects/client/query/view/screens/client_list_view.dart';
 import 'package:easyinvoice/src/common_widgets/widgets/main_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import '../bl_objects/client/view/screens/client_screen.dart';
-import '../bl_objects/item/view/list_view/screens/item_list_view_screen.dart';
+import '../bl_objects/item/query/list_view/screens/item_list_view_screen.dart';
 import '../settings/main/settings/view/screens/settings_screen.dart';
 import 'home/screens/home_screen.dart';
 import '../bl_objects/invoice/view/screens/invoice_screen.dart';
@@ -24,7 +25,7 @@ class _StartState extends State<Start> {
         children: const [
           HomeScreen(),
           InvoiceScreen(),
-          ClientScreen(),
+          ClientListViewScreen(),
           ItemListViewScreen(),
           SettingsScreen(),
         ],

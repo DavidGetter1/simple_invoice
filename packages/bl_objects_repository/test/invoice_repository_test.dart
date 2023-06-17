@@ -4,7 +4,7 @@ import 'package:invoice_api_client/complementary_models/legal_form.dart';
 import 'package:invoice_api_client/invoice_api_client.dart' as invoice_api;
 import 'package:bl_objects_repository/invoice/index.dart';
 import 'package:invoice_api_client/invoice_api_client.dart';
-import 'package:invoice_api_client/invoices/models/invoiceDTO.dart';
+import 'package:invoice_api_client/invoices/models/invoice.dart';
 import 'package:invoice_api_client/items/models/detailedItem.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';

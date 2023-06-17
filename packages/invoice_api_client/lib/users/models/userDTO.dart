@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../src/models/billingInformation.dart';
+import '../../complementary_models/billingInformation.dart';
 import 'dart:io';
 part 'userDTO.g.dart';
 

@@ -4,12 +4,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:invoice_api_client/invoice_api_client.dart';
 
+import '../api_client/api_client.dart';
+
 class InvoiceIdRequestFailure implements Exception {
   String message;
   InvoiceIdRequestFailure(this.message);
 }
 
-class InvoiceApiClient {
+class InvoiceApiClient extends ApiClient<Invoice> {
   InvoiceApiClient({http.Client? httpClient})
       : _httpClient = httpClient ?? http.Client();
   // If you want to test it locally, then the _baseUrl is = 'localhost:5001' for example
@@ -18,16 +20,14 @@ class InvoiceApiClient {
   // the path looks like this then: '/invoice-c63dc/us-central1/ms_bl_objects/v1/bl_objects/invoice
   // when deploying its simply '/api/v1/bl_objects/invoice'
   // dont forget to adjust http correctly
-  static const _baseUrl = 'us-central1-invoice-c63dc.cloudfunctions.net';
+  static const _baseUrl =
+      '192.168.2.110:5001/invoice-c63dc/us-central1/ms_bl_objects';
   final http.Client _httpClient;
 
-  /**
-   * Deletes an [Invoice] by ID.
-   */
-  deleteInvoice(String id) async {
-    final invoiceRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/invoice/$id',
+  @override
+  delete(String id) async {
+    final invoiceRequest = Uri.parse(
+      'http://' + _baseUrl + '/api/v1/bl_objects/invoice/$id',
     );
     final invoiceResponse = await _httpClient.delete(invoiceRequest);
     print(invoiceResponse.body);
@@ -42,14 +42,36 @@ class InvoiceApiClient {
     }
   }
 
-  /**
-   * Fetches an [Invoice] by ID.
-   */
-  dynamic getInvoiceById(String id) async {
+  @override
+  get(Map<String, String> query) async {
+    String stringifiedQuery = Uri(queryParameters: query).query;
+
+    final invoiceRequest = Uri.parse(
+        'http://' + _baseUrl + '/v1/bl_objects/invoice?$stringifiedQuery');
+    final invoiceResponse = await _httpClient.get(invoiceRequest);
+    if (invoiceResponse.statusCode != 200) {
+      throw new Exception(invoiceResponse.body);
+    }
+
+    final invoiceJson = jsonDecode(invoiceResponse.body);
+    if (invoiceJson["data"].isEmpty) {
+      throw new Exception('No invoices found');
+    }
+    try {
+      List<Invoice> invoiceList = List<Invoice>.from(invoiceJson["data"]
+          .map((invoice) => Invoice.fromJson(invoice))
+          .toList());
+      return {"invoiceList": invoiceList, "lastN": invoiceJson["lastN"]};
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  @override
+  getById(String id) async {
     print("fetching");
-    final invoiceRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/invoice/$id',
+    final invoiceRequest = Uri.parse(
+      'http://' + _baseUrl + '/api/v1/bl_objects/invoice/$id',
     );
     final invoiceResponse = await _httpClient.get(invoiceRequest);
 
@@ -64,49 +86,18 @@ class InvoiceApiClient {
     }
 
     try {
-      InvoiceDTO invoice =
-          InvoiceDTO.fromJson(invoiceJson as Map<String, dynamic>);
+      Invoice invoice = Invoice.fromJson(invoiceJson as Map<String, dynamic>);
       return invoice;
     } catch (e) {
       print(e.toString());
     }
   }
 
-  /**
-   * Queries the DB for invoices.
-   */
-  dynamic getInvoices(Map<String, String> query) async {
-    jsonEncode(query);
+  @override
+  insert(Invoice data) async {
     final invoiceRequest =
-        Uri.https(_baseUrl, '/api/v1/bl_objects/invoice', query);
-    final invoiceResponse = await _httpClient.get(invoiceRequest);
-    if (invoiceResponse.statusCode != 200) {
-      throw new Exception(invoiceResponse.body);
-    }
-
-    final invoiceJson = jsonDecode(invoiceResponse.body);
-    if (invoiceJson["data"].isEmpty) {
-      throw new Exception('No invoices found');
-    }
-    try {
-      List<InvoiceDTO> invoiceList = List<InvoiceDTO>.from(invoiceJson["data"]
-          .map((invoice) => InvoiceDTO.fromJson(invoice))
-          .toList());
-      return {"invoiceList": invoiceList, "lastN": invoiceJson["lastN"]};
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  /**
-   * Inserts the [Invoice] into the DB.
-   */
-  insertInvoice(InvoiceDTO invoice) async {
-    final invoiceRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/invoice',
-    );
-    String invoiceJson = jsonEncode(invoice.toJson());
+        Uri.parse('http://' + _baseUrl + '/v1/bl_objects/invoice');
+    String invoiceJson = jsonEncode(data.toJson());
     final invoiceResponse = await _httpClient.put(invoiceRequest,
         body: invoiceJson, headers: {"Content-Type": "application/json"});
     print(invoiceResponse.body);
@@ -117,15 +108,12 @@ class InvoiceApiClient {
     return decodedResponse["upsertedId"];
   }
 
-  /**
-   * Inserts the [Invoice] into the DB.
-   */
-  updateInvoice(InvoiceDTO invoice) async {
-    final invoiceRequest = Uri.https(
-      _baseUrl,
-      '/api/v1/bl_objects/invoice',
-    );
-    String invoiceJson = jsonEncode(invoice.toJson());
+  @override
+  update(Invoice data) async {
+    final invoiceRequest =
+        Uri.parse('http://' + _baseUrl + '/v1/bl_objects/invoice');
+
+    String invoiceJson = jsonEncode(data.toJson());
     final invoiceResponse = await _httpClient.put(invoiceRequest,
         body: invoiceJson, headers: {"Content-Type": "application/json"});
     if (invoiceResponse.statusCode != 200) {

@@ -19,7 +19,7 @@ Map<String, dynamic> _$InvoiceCreatedStateToJson(
 
 InvoiceFetchedState _$InvoiceFetchedStateFromJson(Map<String, dynamic> json) =>
     InvoiceFetchedState(
-      invoice: InvoiceDTO.fromJson(json['invoice'] as Map<String, dynamic>),
+      invoice: Invoice.fromJson(json['invoice'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$InvoiceFetchedStateToJson(
@@ -32,7 +32,7 @@ InvoiceListFetchedState _$InvoiceListFetchedStateFromJson(
         Map<String, dynamic> json) =>
     InvoiceListFetchedState(
       invoiceList: (json['invoiceList'] as List<dynamic>)
-          .map((e) => InvoiceDTO.fromJson(e as Map<String, dynamic>))
+          .map((e) => Invoice.fromJson(e as Map<String, dynamic>))
           .toList(),
       lastN: json['lastN'] as int,
     );

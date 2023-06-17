@@ -13,14 +13,14 @@ class InvoiceCubit extends HydratedCubit<InvoiceState> {
   }
 
   final InvoiceRepository _invoiceRepository;
-  List<InvoiceDTO> _invoiceList = [];
+  List<Invoice> _invoiceList = [];
   int _skip = 0;
 
-  Future<void> updateInvoice(InvoiceDTO invoice) async {
+  Future<void> updateInvoice(Invoice invoice) async {
     emit(LoadingState());
 
     try {
-      await _invoiceRepository.updateInvoice(invoice);
+      await _invoiceRepository.update(invoice);
 
       emit(InvoiceUpdatedState());
     } on Exception {
@@ -34,7 +34,7 @@ class InvoiceCubit extends HydratedCubit<InvoiceState> {
     emit(LoadingState());
 
     try {
-      final invoice = await _invoiceRepository.getInvoice(id);
+      final invoice = await _invoiceRepository.get(id);
 
       emit(InvoiceFetchedState(invoice: invoice));
     } on Exception {
@@ -48,7 +48,7 @@ class InvoiceCubit extends HydratedCubit<InvoiceState> {
     emit(LoadingState());
 
     try {
-      await _invoiceRepository.deleteInvoice(id);
+      await _invoiceRepository.delete(id);
       emit(InvoiceDeletedState());
     } on Exception {
       emit(const FailureState(errorMessage: 'errorMessage'));
@@ -66,27 +66,18 @@ class InvoiceCubit extends HydratedCubit<InvoiceState> {
     }
 
     try {
-      InvoiceResponse response = await _invoiceRepository.getInvoices(query);
-      if (pagination) {
-        _skip = response.lastN;
-      }
-      if (response.invoiceList.isEmpty) {
-        emit(NoMoreResultsState());
-        return;
-      }
-      _invoiceList += response.invoiceList;
-      emit(InvoiceListFetchedState(
-          invoiceList: _invoiceList, lastN: response.lastN));
+      await _invoiceRepository.getByQuery(query, false);
+      // _invoiceList += response.invoiceList;
     } on Exception {
       emit(const FailureState(errorMessage: 'errorMessage'));
     }
   }
 
-  Future<void> insertInvoice(InvoiceDTO invoice) async {
+  Future<void> insertInvoice(Invoice invoice) async {
     emit(LoadingState());
 
     try {
-      final String id = await _invoiceRepository.insertInvoice(invoice);
+      await _invoiceRepository.insert(invoice);
 
       emit(InvoiceCreatedState(id: id));
     } on Exception {

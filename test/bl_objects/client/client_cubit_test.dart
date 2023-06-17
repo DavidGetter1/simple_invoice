@@ -1,16 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:bloc_test/bloc_test.dart';
-import 'package:easyinvoice/bl_objects/client/client_cubit.dart';
+import 'package:easyinvoice/bl_objects/client/client_mutate_cubit.dart';
 import 'package:invoice_api_client/invoice_api_client.dart';
 
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
-import 'package:bl_objects_repository/client/index.dart'
-as client_repository;
+import 'package:bl_objects_repository/client/index.dart' as client_repository;
 
 import '../../helpers/hydrated_bloc.dart';
-
-
 
 class MockClientRepository extends Mock
     implements client_repository.ClientRepository {}
@@ -65,7 +62,7 @@ void main() {
       when(() => client.city).thenReturn("city");
       when(() => client.phoneNumber).thenReturn("019285973935");
       when(
-            () => clientRepository.getClient(any()),
+        () => clientRepository.getClient(any()),
       ).thenAnswer((_) async => rclient);
       clientCubit = ClientCubit(clientRepository);
     });
@@ -79,7 +76,8 @@ void main() {
       test('work properly', () async {
         final clientCubit = ClientCubit(clientRepository);
         await clientCubit.fetchClient("id");
-        when(() => clientRepository.getClient("id")).thenAnswer((_) async => Future.value(rclient));
+        when(() => clientRepository.getClient("id"))
+            .thenAnswer((_) async => Future.value(rclient));
         expect(
           clientCubit.fromJson(clientCubit.toJson(clientCubit.state)!),
           clientCubit.state,
@@ -90,7 +88,8 @@ void main() {
     group('right states', () {
       test('is in ClientFetched after client is returned', () async {
         final clientCubit = ClientCubit(clientRepository);
-        when(() => clientRepository.getClient("id")).thenAnswer((_) async => Future.value(rclient));
+        when(() => clientRepository.getClient("id"))
+            .thenAnswer((_) async => Future.value(rclient));
         await clientCubit.fetchClient("id");
         expect(
           ClientFetchedState(client: rclient),
@@ -99,7 +98,8 @@ void main() {
       });
       test('is in FailureState after exception is thrown', () async {
         final clientCubit = ClientCubit(clientRepository);
-        when(() => clientRepository.getClient("id")).thenAnswer((_) async => throw Exception("crash"));
+        when(() => clientRepository.getClient("id"))
+            .thenAnswer((_) async => throw Exception("crash"));
         await clientCubit.fetchClient("id");
         expect(
           FailureState(errorMessage: "crash"),
@@ -110,9 +110,13 @@ void main() {
     group('pagination', () {
       test('pagination works', () async {
         final clientCubit = ClientCubit(clientRepository);
-        when(() => clientRepository.getClients(any())).thenAnswer((_) async => Future.value(client_repository.ClientResponse(clientList: [rclient], lastN: 1)));
+        when(() => clientRepository.getClients(any())).thenAnswer((_) async =>
+            Future.value(client_repository.ClientResponse(
+                clientList: [rclient], lastN: 1)));
         await clientCubit.fetchClients(query: {}, pagination: true);
-        when(() => clientRepository.getClients(any())).thenAnswer((_) async => Future.value(client_repository.ClientResponse(clientList: [rclient2], lastN: 2)));
+        when(() => clientRepository.getClients(any())).thenAnswer((_) async =>
+            Future.value(client_repository.ClientResponse(
+                clientList: [rclient2], lastN: 2)));
         await clientCubit.fetchClients(query: {}, pagination: true);
         expect(
           ClientListFetchedState(clientList: [rclient, rclient2], lastN: 2),
@@ -121,9 +125,13 @@ void main() {
       });
       test('pagination set on false works', () async {
         final clientCubit = ClientCubit(clientRepository);
-        when(() => clientRepository.getClients(any())).thenAnswer((_) async => Future.value(client_repository.ClientResponse(clientList: [rclient], lastN: 1)));
+        when(() => clientRepository.getClients(any())).thenAnswer((_) async =>
+            Future.value(client_repository.ClientResponse(
+                clientList: [rclient], lastN: 1)));
         await clientCubit.fetchClients(query: {}, pagination: true);
-        when(() => clientRepository.getClients(any())).thenAnswer((_) async => Future.value(client_repository.ClientResponse(clientList: [rclient2], lastN: 2)));
+        when(() => clientRepository.getClients(any())).thenAnswer((_) async =>
+            Future.value(client_repository.ClientResponse(
+                clientList: [rclient2], lastN: 2)));
         await clientCubit.fetchClients(query: {}, pagination: true);
         expect(
           ClientListFetchedState(clientList: [rclient, rclient2], lastN: 2),

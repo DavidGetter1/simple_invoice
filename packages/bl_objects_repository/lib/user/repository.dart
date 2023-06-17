@@ -19,6 +19,8 @@ class UserRepository {
   final UserApiClient _userApiClient;
   late AuthenticationRepository _authenticationRepository;
 
+  String _id = 'uninitialized';
+
   void setAuthenticationRepository(
       AuthenticationRepository authenticationRepository) {
     _authenticationRepository = authenticationRepository;
@@ -26,7 +28,9 @@ class UserRepository {
   }
 
   Future<void> _onUserIdChanged(String id) async {
-    _currentUser = await getOrCreateUser(id);
+    if (_id == id) return;
+    _id = id;
+    _currentUser = await getOrCreateUser(_id);
   }
 
   Future<User> getUser(String id) async {
@@ -72,15 +76,13 @@ class UserRepository {
     return insertedId;
   }
 
-  updateUser(String id, String name, BillingInformation billingInformation,
-      Locale locale, String email, bool hasPremium) async {
-    UserDTO userDTO = UserDTO(
-        id: id,
-        name: name,
-        billingInformation: billingInformation,
-        locale: locale,
-        email: email,
-        hasPremium: hasPremium);
+  updateBillingInformation(
+      String id, BillingInformation billingInformation) async {
+    await _userApiClient.updateBillingInformation(id, billingInformation);
+  }
+
+  updateUser(String id, String name, String email) async {
+    UserDTO userDTO = UserDTO(id: id, name: name, email: email);
     await _userApiClient.updateUser(userDTO);
   }
 }

@@ -1,8 +1,6 @@
-export 'items/models/itemDTO.dart';
-export 'invoices/models/invoiceDTO.dart';
+export 'items/models/item.dart';
+export 'invoices/models/invoice.dart';
 export 'users/models/userDTO.dart';
-export 'src/models/billingInformation.dart';
-export 'src/models/paymentInformation.dart';
-export 'clients/models/client.dart';
+export 'complementary_models/billingInformation.dart';
+export 'complementary_models/paymentInformation.dart';
 export 'items/models/detailedItem.dart';
-export 'items/models/itemResponse.dart';

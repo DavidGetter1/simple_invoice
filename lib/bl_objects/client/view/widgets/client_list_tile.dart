@@ -36,7 +36,7 @@ class ClientListTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(24)),
         ),
         title: Text(
-          client.name,
+          client.name ?? "no name",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text("Last invoice".i18n + ": 05.06.2022"),
