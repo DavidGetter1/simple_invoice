@@ -4,6 +4,7 @@ import 'package:bl_objects_repository/invoice/repository.dart';
 import 'package:bl_objects_repository/item/repository.dart';
 import 'package:bl_objects_repository/user/repository.dart';
 import 'package:easyinvoice/bl_objects/client/mutate/view/screens/client_create_screen.dart';
+import 'package:easyinvoice/bl_objects/item/query/list_view/screens/item_list_view_screen.dart';
 import 'package:easyinvoice/settings/customize_invoice/view/customize_invoice_screen.dart';
 import 'package:easyinvoice/src/start.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +61,12 @@ class MyApp extends StatelessWidget {
         path: '/client-list',
         builder: (context, state) {
           return I18n(child: const ClientListViewScreen());
+        },
+      ),
+      GoRoute(
+        path: '/item-list',
+        builder: (context, state) {
+          return I18n(child: const ItemListViewScreen());
         },
       ),
       GoRoute(

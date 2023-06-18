@@ -59,8 +59,13 @@ class ItemListViewScreen extends StatelessWidget {
                             title: Text(item.title),
                             subtitle:
                                 Text(item.description ?? "No description"),
-                            onTap: () =>
-                                context.push("/create-item", extra: item));
+                            onTap: () {
+                              if (context.canPop()) {
+                                context.pop(item);
+                              } else {
+                                context.push("/create-item", extra: item);
+                              }
+                            });
                       });
                 }
                 return Container();
